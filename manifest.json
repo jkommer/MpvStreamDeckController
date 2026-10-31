@@ -1,0 +1,28 @@
+{
+    "Actions": [],
+    "$schema": "https://schemas.elgato.com/streamdeck/plugins/manifest.json",
+    "UUID": "com.jkommer.mpv",
+    "Author": "jkommer",
+    "Description": "A stream deck plugin to control mpv",
+    "Name": "mpv",
+    "Icon": "Images/plugin/png/mpv",
+    "Version": "0.0.0.1",
+    "CodePath": "com.jkommer.mpv.exe",
+    "Category": "mpv",
+    "CategoryIcon": "Images/plugin/svg/mpv-category",
+    "OS": [
+        {
+            "Platform": "windows",
+            "MinimumVersion": "10"
+        }
+    ],
+    "SDKVersion": 2,
+    "Software": {
+        "MinimumVersion": "6.4"
+    },
+    "ApplicationsToMonitor": {
+        "windows": [
+            "mpv.exe"
+        ]
+    }
+}
