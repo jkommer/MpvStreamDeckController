@@ -1,12 +1,125 @@
 {
-    "Actions": [],
+    "Actions": [
+        {
+            "Icon": "Images/key/svg/01_next_audio_track",
+            "Name": "Cycle Audio",
+            "States": [
+                {
+                    "Image": "Images/key/svg/01_next_audio_track",
+                    "TitleAlignment": "middle",
+                    "FontSize": 12
+                }
+            ],
+            "SupportedInMultiActions": true,
+            "Tooltip": "Cycle Audio",
+            "UUID": "com.jkommer.mpv.cycleaudio"
+        },
+        {
+            "Icon": "Images/key/svg/02_next_subtitle",
+            "Name": "Cycle Subtitles",
+            "States": [
+                {
+                    "Image": "Images/key/svg/02_next_subtitle",
+                    "TitleAlignment": "middle",
+                    "FontSize": 12
+                }
+            ],
+            "SupportedInMultiActions": true,
+            "Tooltip": "Cycle Subtitles",
+            "UUID": "com.jkommer.mpv.cyclesubtitle"
+        },
+        {
+            "Icon": "Images/key/svg/03_next_chapter",
+            "Name": "Next Chapter",
+            "States": [
+                {
+                    "Image": "Images/key/svg/03_next_chapter",
+                    "TitleAlignment": "middle",
+                    "FontSize": 12
+                }
+            ],
+            "SupportedInMultiActions": true,
+            "Tooltip": "Next Chapter",
+            "UUID": "com.jkommer.mpv.nextchapter"
+        },
+        {
+            "Icon": "Images/key/svg/04_prev_chapter",
+            "Name": "Previous Chapter",
+            "States": [
+                {
+                    "Image": "Images/key/svg/04_prev_chapter",
+                    "TitleAlignment": "middle",
+                    "FontSize": 12
+                }
+            ],
+            "SupportedInMultiActions": true,
+            "Tooltip": "Previous Chapter",
+            "UUID": "com.jkommer.mpv.previouschapter"
+        },
+        {
+            "Icon": "Images/key/svg/05_next_playlist_entry",
+            "Name": "Next Playlist Entry",
+            "States": [
+                {
+                    "Image": "Images/key/svg/05_next_playlist_entry",
+                    "TitleAlignment": "middle",
+                    "FontSize": 12
+                }
+            ],
+            "SupportedInMultiActions": true,
+            "Tooltip": "Next Playlist Entry",
+            "UUID": "com.jkommer.mpv.nextplaylistentry"
+        },
+        {
+            "Icon": "Images/key/svg/06_prev_playlist_entry",
+            "Name": "Previous Playlist Entry",
+            "States": [
+                {
+                    "Image": "Images/key/svg/06_prev_playlist_entry",
+                    "TitleAlignment": "middle",
+                    "FontSize": 12
+                }
+            ],
+            "SupportedInMultiActions": true,
+            "Tooltip": "Previous Playlist Entry",
+            "UUID": "com.jkommer.mpv.previousplaylistentry"
+        },
+        {
+            "Icon": "Images/key/svg/07_play_pause",
+            "Name": "Play/Pause",
+            "States": [
+                {
+                    "Image": "Images/key/svg/07_play_pause",
+                    "TitleAlignment": "middle",
+                    "FontSize": 12
+                }
+            ],
+            "SupportedInMultiActions": true,
+            "Tooltip": "Play / Pause",
+            "UUID": "com.jkommer.mpv.playpause"
+        },
+        {
+            "Icon": "Images/key/svg/08a_acompressor_on",
+            "Name": "Toggle Acompressor",
+            "States": [
+                {
+                    "Image": "Images/key/svg/08a_acompressor_on",
+                    "TitleAlignment": "middle",
+                    "FontSize": 12
+                }
+            ],
+            "SupportedInMultiActions": true,
+            "Tooltip": "Toggle Acompressor",
+            "UUID": "com.jkommer.mpv.toggleacompressor"
+        }
+    ],
     "$schema": "https://schemas.elgato.com/streamdeck/plugins/manifest.json",
     "UUID": "com.jkommer.mpv",
     "Author": "jkommer",
     "Description": "A stream deck plugin to control mpv",
     "Name": "mpv",
     "Icon": "Images/plugin/png/mpv",
-    "Version": "0.0.0.1",
+    "Version": "0.0.1.0",
     "CodePath": "com.jkommer.mpv.exe",
     "Category": "mpv",
     "CategoryIcon": "Images/plugin/svg/mpv-category",
