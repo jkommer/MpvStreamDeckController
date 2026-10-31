@@ -8,7 +8,8 @@ namespace MpvStreamDeckController
 
         private static readonly MpvClient Client = new(ConnectPipeAsync);
 
-        public static Task<bool> SendCommandAsync(object[] command) => Client.SendAsync(command);
+        public static Task<bool> SendCommandAsync(object[] command) => Client.SendAsync(command);        
+        public static void NotifyApplicationLaunched() => Client.NotifyLaunched();
 
         private static async Task<Stream?> ConnectPipeAsync(TimeSpan timeout, CancellationToken token)
         {
@@ -25,7 +26,6 @@ namespace MpvStreamDeckController
                 token.ThrowIfCancellationRequested();
                 return null; 
             }
-        }
-        
+        }        
     }
 }

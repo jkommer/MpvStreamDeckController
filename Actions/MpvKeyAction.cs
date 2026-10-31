@@ -2,9 +2,14 @@ using BarRaider.SdTools;
 
 namespace MpvStreamDeckController.Actions
 {
-    public abstract class MpvKeyAction(ISDConnection connection, InitialPayload payload) : KeypadBase(connection, payload)
+    public abstract class MpvKeyAction : KeypadBase
     {
         protected abstract object[]? Command { get; }
+
+        protected MpvKeyAction(ISDConnection connection, InitialPayload payload) : base(connection, payload)
+        {
+            MpvLaunchHook.EnsureAttached(connection);
+        }
 
         public override async void KeyPressed(KeyPayload payload)
         {
