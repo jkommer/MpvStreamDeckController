@@ -117,7 +117,54 @@
             "SupportedInMultiActions": true,
             "Tooltip": "Toggle Acompressor",
             "UUID": "com.jkommer.mpv.toggleacompressor"
-        }
+        },
+        {
+            "Icon": "Images/dial/09_seek_dial",
+            "Name": "Seek",
+            "Controllers": [
+                "Keypad",
+                "Encoder"
+            ],
+            "Encoder": {
+                "layout": "$B1",
+                "TriggerDescription": {
+                    "Push": "Play / Pause",
+                    "Rotate": "Seek",
+                    "Touch": "Play / Pause"
+                }
+            },
+            "States": [
+                {
+                    "Image": "Images/dial/09_seek_dial"
+                }
+            ],
+            "UUID": "com.jkommer.mpv.seek"
+        },
+        {
+        "Icon": "Images/dial/11a_volume_dial",
+        "Name": "Volume",
+        "Tooltip": "Rotate to change mpv's volume, press to mute",
+        "Controllers": [
+            "Encoder"
+        ],
+        "Encoder": {
+            "layout": "$B1",
+            "TriggerDescription": {
+            "Push": "Mute / Unmute",
+            "Rotate": "Volume",
+            "Touch": "Mute / Unmute"
+            }
+        },
+        "States": [
+            {
+            "Image": "Images/dial/11a_volume_dial"
+            },
+            {
+            "Image": "Images/dial/11b_volume_muted_dial"
+            }
+        ],
+        "UUID": "com.jkommer.mpv.volume"
+        }        
     ],
     "$schema": "https://schemas.elgato.com/streamdeck/plugins/manifest.json",
     "UUID": "com.jkommer.mpv",
