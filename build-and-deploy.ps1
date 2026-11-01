@@ -9,7 +9,7 @@ $ErrorActionPreference = 'Stop'
 # ---- Configuration ----------------------------------------------------------
 $ProjectRoot     = $PSScriptRoot
 $PluginId        = 'com.jkommer.mpv'
-$PluginDir       = Join-Path $ProjectRoot "bin\Release\$PluginId.sdPlugin"
+$PluginDir       = Join-Path $ProjectRoot "src\MpvStreamDeckController\bin\Release\$PluginId.sdPlugin"
 $PackageFile     = Join-Path $PluginDir   "$PluginId.streamDeckPlugin"
 $InstalledDir    = Join-Path $env:APPDATA "Elgato\StreamDeck\Plugins\$PluginId.sdPlugin"
 $StreamDeckExe   = 'C:\Program Files\Elgato\StreamDeck\StreamDeck.exe'
@@ -54,23 +54,58 @@ function Wait-Until([scriptblock]$Condition, [int]$Seconds) {
     return [bool](& $Condition)
 }
 
+# Calculates the version from git history. Returns:
+#   SemVer   - for the assembly (e.g. 1.2.4-2)
+#   Manifest - for the Stream Deck manifest, which wants major.minor.patch.build (e.g. 1.2.4.2)
+function Get-GitVersionInfo {
+    Write-Step 'GitVersion'
+    if (-not (Get-Command dotnet-gitversion -ErrorAction SilentlyContinue)) {
+        Fail 'dotnet-gitversion not found. Install it with: dotnet tool install --global GitVersion.Tool --version 6.8.*'
+    }
+
+    # GitVersion.Tool 6.x may target an older .NET than the one installed here; allow it to roll forward.
+    $previous = $env:DOTNET_ROLL_FORWARD
+    $env:DOTNET_ROLL_FORWARD = 'Major'
+    try { $output = & dotnet-gitversion | Out-String }
+    finally { $env:DOTNET_ROLL_FORWARD = $previous }
+    if ($LASTEXITCODE -ne 0) { Fail "dotnet-gitversion (exit code $LASTEXITCODE)`n$output" }
+
+    try { $info = $output | ConvertFrom-Json }
+    catch { Fail "Could not read the dotnet-gitversion output:`n$output" }
+
+    if ($null -eq $info.VersionSourceDistance) { Fail 'GitVersion output has no VersionSourceDistance.' }
+
+    Write-Host "OK" -ForegroundColor Green
+    [pscustomobject]@{
+        SemVer   = $info.SemVer
+        Manifest = "$($info.MajorMinorPatch).$($info.VersionSourceDistance)"
+    }
+}
+
+Push-Location $ProjectRoot
 try {
-    Set-Location $ProjectRoot
+    $version = Get-GitVersionInfo
+    Write-Host "Assembly version: $($version.SemVer)    Manifest version: $($version.Manifest)"
 
     Invoke-Checked 'dotnet clean' { dotnet clean }
-    Invoke-Checked 'dotnet build -c Release' { dotnet build -c Release }
+    Invoke-Checked 'dotnet build -c Release' { dotnet build -c Release "-p:Version=$($version.SemVer)" }
 
-    Write-Step "cd $PluginDir"
+    Write-Step "pushd $PluginDir"
     if (-not (Test-Path $PluginDir)) { Fail "Plugin output folder not found: $PluginDir" }
-    Set-Location $PluginDir
-    Write-Host "OK" -ForegroundColor Green
+    Push-Location $PluginDir
+    try {
+        Write-Host "OK" -ForegroundColor Green
 
-    Invoke-Checked 'streamdeck validate' { streamdeck validate }
+        Invoke-Checked 'streamdeck validate' { streamdeck validate }
 
-    # remove stale package first so it isn't bundled/overwritten
-    if (Test-Path $PackageFile) { Remove-Item $PackageFile -Force }
-    Invoke-Checked 'streamdeck pack' { streamdeck pack . --force }
-    if (-not (Test-Path $PackageFile)) { Fail "Package not found after packing: $PackageFile" }
+        # remove stale package first so it isn't bundled/overwritten
+        if (Test-Path $PackageFile) { Remove-Item $PackageFile -Force }
+        Invoke-Checked 'streamdeck pack' { streamdeck pack . --force --version "$($version.Manifest)" }
+        if (-not (Test-Path $PackageFile)) { Fail "Package not found after packing: $PackageFile" }
+    }
+    finally {
+        Pop-Location
+    }
 
     Write-Step 'Stopping Stream Deck'
     if (Get-Process -Name $ProcessName -ErrorAction SilentlyContinue) {
@@ -115,4 +150,7 @@ try {
 }
 catch {
     Fail $_.Exception.Message
+}
+finally {
+    Pop-Location
 }

@@ -16,6 +16,16 @@ jobs:
  
     steps:
     - uses: actions/checkout@v6
+      with:
+        fetch-depth: 0 
+
+    - name: Install GitVersion
+      uses: gittools/actions/gitversion/setup@v4.7.0
+      with:
+        versionSpec: '6.8.x'
+    - name: Determine version
+      id: gitversion
+      uses: gittools/actions/gitversion/execute@v4.7.0
 
     - name: Setup .NET
       uses: actions/setup-dotnet@v5
@@ -24,12 +34,12 @@ jobs:
     - name: Restore dependencies
       run: dotnet restore
     - name: Build
-      run: dotnet build -c Release --no-restore
+      run: dotnet build -c Release --no-restore -p:Version=${{ steps.gitversion.outputs.semVer }}
     - name: Test
       run: dotnet test -c Release --no-build --verbosity normal 
     
     - name: Setup Node.js
-      uses: actions/setup-node@v4
+      uses: actions/setup-node@v7
       with:
         node-version: lts/*
     - name: Install Stream Deck CLI
@@ -37,11 +47,11 @@ jobs:
     - name: Validate plugin
       run: streamdeck validate "${{ env.PLUGIN_DIR }}" --no-update-check
     - name: Pack plugin
-      run: streamdeck pack "${{ env.PLUGIN_DIR }}" --output dist --no-update-check --no-file-list
+      run: streamdeck pack "${{ env.PLUGIN_DIR }}" --output dist --no-update-check --no-file-list --version "${{ steps.gitversion.outputs.majorMinorPatch }}.${{ steps.gitversion.outputs.versionSourceDistance }}"
     
     - name: Upload package
-      uses: actions/upload-artifact@v4
+      uses: actions/upload-artifact@v7
       with:
-        name: ${{ env.PLUGIN_ID }}
+        name: ${{ env.PLUGIN_ID }}-${{ steps.gitversion.outputs.semVer }}
         path: dist/*.streamDeckPlugin
         if-no-files-found: error
