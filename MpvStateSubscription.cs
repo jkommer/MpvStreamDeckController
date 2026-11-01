@@ -25,16 +25,6 @@ namespace MpvStreamDeckController
             OnStateChanged(MpvCommand.State);
         }
 
-        public void ReapplyFeedback()
-        {
-            lock (_syncLock)
-            {
-                _previousFeedback = null;
-            }
-
-            OnStateChanged(MpvCommand.State);
-        }
-
         private void OnStateChanged(MpvState state)
         {
             if (_disposed)

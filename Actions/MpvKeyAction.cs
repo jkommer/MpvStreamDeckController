@@ -38,9 +38,6 @@ namespace MpvStreamDeckController.Actions
                 }
 
                 await Connection.ShowAlert();
-
-                // Stream Deck flips a multi-state key on every press whether or not anything happened, so put the key back to what mpv actually shows.
-                _stateSubscription?.ReapplyFeedback();
             }
             catch (Exception ex)
             {
