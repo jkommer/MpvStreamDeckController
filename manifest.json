@@ -103,11 +103,17 @@
             "Name": "Toggle Acompressor",
             "States": [
                 {
+                    "Image": "Images/key/svg/08b_acompressor_off",
+                    "TitleAlignment": "middle",
+                    "FontSize": 12
+                },
+                {
                     "Image": "Images/key/svg/08a_acompressor_on",
                     "TitleAlignment": "middle",
                     "FontSize": 12
                 }
             ],
+            "DisableAutomaticStates": true,
             "SupportedInMultiActions": true,
             "Tooltip": "Toggle Acompressor",
             "UUID": "com.jkommer.mpv.toggleacompressor"
