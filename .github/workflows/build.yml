@@ -1,18 +1,22 @@
 name: Build
-
+ 
 on:
   push:
     branches: [ "main" ]
   pull_request:
     branches: [ "main" ]
-
+ 
+env:
+  PLUGIN_ID: com.jkommer.mpv
+  PLUGIN_DIR: bin/Release/com.jkommer.mpv.sdPlugin
+ 
 jobs:
-  build:
-
-    runs-on: ubuntu-latest
-
+  build: 
+    runs-on: windows-latest
+ 
     steps:
     - uses: actions/checkout@v6
+
     - name: Setup .NET
       uses: actions/setup-dotnet@v5
       with:
@@ -20,6 +24,24 @@ jobs:
     - name: Restore dependencies
       run: dotnet restore
     - name: Build
-      run: dotnet build --no-restore
+      run: dotnet build -c Release --no-restore
     - name: Test
-      run: dotnet test --no-build --verbosity normal
+      run: dotnet test -c Release --no-build --verbosity normal 
+    
+    - name: Setup Node.js
+      uses: actions/setup-node@v4
+      with:
+        node-version: lts/*
+    - name: Install Stream Deck CLI
+      run: npm install -g @elgato/cli@1.10.4
+    - name: Validate plugin
+      run: streamdeck validate "${{ env.PLUGIN_DIR }}" --no-update-check
+    - name: Pack plugin
+      run: streamdeck pack "${{ env.PLUGIN_DIR }}" --output dist --no-update-check --no-file-list
+    
+    - name: Upload package
+      uses: actions/upload-artifact@v4
+      with:
+        name: ${{ env.PLUGIN_ID }}
+        path: dist/*.streamDeckPlugin
+        if-no-files-found: error
