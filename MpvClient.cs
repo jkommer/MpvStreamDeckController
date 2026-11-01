@@ -16,21 +16,43 @@ namespace MpvStreamDeckController
         public delegate Task<Stream?> Connector(TimeSpan timeout, CancellationToken token);
 
         private readonly Connector _connector;
-        public readonly MpvClientOptions _options;
-        private readonly CancellationTokenSource _cancellationTokenSource = new();
+        private readonly MpvClientOptions _options;
+        private readonly MpvStateTracker _stateTracker;
+
+        
         private readonly SemaphoreSlim _writeLock = new(1, 1);
         private readonly SemaphoreSlim _connectRequested = new(0, 1);
-        private Stream? _mpvStream;
+        private readonly CancellationTokenSource _cancellationTokenSource = new();
 
-        private bool _isConnected;
+        private Stream? _mpvStream;
+        
+        /// <summary>
+        /// Used to keep track of the stream we registered our observers on. 
+        /// </summary>
+        private Stream? _observedMpvStream; 
+
+        /// <summary>
+        /// Property names that are currently being observed.
+        /// </summary>
+        private readonly HashSet<string> _registeredObservedProperties = new();
+
 
         public MpvClient(Connector connector, MpvClientOptions? options = null)
         {
             _connector = connector;
             _options = options ?? new MpvClientOptions();
+            _stateTracker = new MpvStateTracker(() => _ = SyncObservedPropertiesAsync());
 
             _ = Task.Run(() => KeepConnectedAsync(_cancellationTokenSource.Token));
         }
+
+        public event Action<MpvState>? StateChanged
+        {
+            add => _stateTracker.StateChanged += value;
+            remove => _stateTracker.StateChanged -= value;
+        }
+
+        public MpvState State => _stateTracker.State;
 
         private async Task KeepConnectedAsync(CancellationToken token)
         {
@@ -59,7 +81,7 @@ namespace MpvStreamDeckController
                     catch (Exception ex) when (ex is not OperationCanceledException)
                     {
                         LogHelper.Log(TracingLevel.ERROR, $"mpv session error: {ex.Message}");
-                        await Task.Delay(TimeSpan.FromSeconds(1), token); 
+                        await Task.Delay(TimeSpan.FromSeconds(1), token);
                     }
                 }
             }
@@ -86,7 +108,7 @@ namespace MpvStreamDeckController
             }
             catch (Exception ex)
             {
-                LogHelper.Log(TracingLevel.DEBUG, $"mpv connector failed: {ex.Message}");
+                LogHelper.Log(TracingLevel.ERROR, $"mpv connector failed: {ex.Message}");
                 return false;
             }
 
@@ -97,18 +119,22 @@ namespace MpvStreamDeckController
 
             using (stream)
             {
-                _connectRequested.Wait(0); // connected, so any pending launch signal has served its purpose
+                // connected, so any pending launch signal has served its purpose
+                _connectRequested.Wait(0); 
 
                 try
                 {
                     _mpvStream = stream;
-                    _isConnected = true;
+
+                    _stateTracker.Connected();
+                    _ = SyncObservedPropertiesAsync(); 
 
                     using var reader = new StreamReader(stream, Encoding.UTF8);
 
                     while (await reader.ReadLineAsync(token) is { } line)
                     {
-                        // keep connection open. 
+                        if (MpvProtocol.TryParsePropertyChange(line, out var id, out var value))
+                            _stateTracker.RegisterPropertyChange(id, value);
                     }
                 }
                 catch (Exception ex) when (ex is not OperationCanceledException)
@@ -118,11 +144,7 @@ namespace MpvStreamDeckController
                 finally
                 {
                     _mpvStream = null;
-
-                    if (_isConnected)
-                    {
-                        _isConnected = false;
-                    }
+                    _stateTracker.Disconnected();
                 }
             }
 
@@ -138,6 +160,7 @@ namespace MpvStreamDeckController
         public async Task<bool> SendAsync(object[] command)
         {
             var pipe = _mpvStream;
+
             if (pipe is null)
             {
                 LogHelper.Log(TracingLevel.WARN, "mpv is not connected; command dropped.");
@@ -146,6 +169,7 @@ namespace MpvStreamDeckController
             }
 
             await _writeLock.WaitAsync();
+
             try
             {
                 await pipe.WriteAsync(Encoding.UTF8.GetBytes(MpvProtocol.BuildCommand(command)));
@@ -153,7 +177,7 @@ namespace MpvStreamDeckController
             }
             catch (Exception ex)
             {
-                LogHelper.Log(TracingLevel.WARN, $"Error sending MPV command: {ex.Message}");
+                LogHelper.Log(TracingLevel.ERROR, $"Error sending MPV command: {ex.Message}");
                 return false;
             }
             finally
@@ -167,5 +191,63 @@ namespace MpvStreamDeckController
             try { _connectRequested.Release(); }
             catch (SemaphoreFullException) { }
         }
+
+        public IDisposable ObserveProperty(IReadOnlyCollection<MpvProperty> properties) => _stateTracker.ObserveProperty(properties);
+
+        /// <summary>
+        /// Sync our observed properties with the connected mpv instance. Adding any missing ones and removing any which
+        /// we no longer care about. 
+        /// </summary>
+        private async Task SyncObservedPropertiesAsync()
+        {
+            await _writeLock.WaitAsync();
+
+            try
+            {
+                var pipe = _mpvStream;
+
+                if (pipe is null)
+                {
+                    return;
+                }
+
+                // our connection has changed; get rid of any previous observers as those might no longer apply.
+                if (!ReferenceEquals(_observedMpvStream, pipe))
+                {
+                    _registeredObservedProperties.Clear();
+                    _observedMpvStream = pipe;
+                }
+
+                var properties = MpvProperties.All;
+
+                foreach (var property in properties.Values)
+                {
+                    var name = property.Name;
+                    var isObserved = _stateTracker.IsPropertyObserved(property);
+                    var isRegistered = _registeredObservedProperties.Contains(name);
+
+                    if (isObserved && !isRegistered)
+                    {
+                        await pipe.WriteAsync(Encoding.UTF8.GetBytes(MpvProtocol.BuildObserveProperty(property.Id, name)));
+                        _registeredObservedProperties.Add(name);
+                    }
+                    else if (!isObserved && isRegistered)
+                    {
+                        await pipe.WriteAsync(Encoding.UTF8.GetBytes(MpvProtocol.BuildUnobserveProperty(property.Id)));
+                        _registeredObservedProperties.Remove(name);
+                    }
+                }
+            }
+            catch (Exception ex)
+            {
+                LogHelper.Log(TracingLevel.ERROR, $"Syncing mpv observations failed: {ex.Message}");
+            }
+            finally
+            {
+                _writeLock.Release();
+            }
+        }
+        
+        public void Dispose() => _cancellationTokenSource.Cancel();
     }
 }
