@@ -164,7 +164,7 @@ namespace MpvStreamDeckController
             if (pipe is null)
             {
                 LogHelper.Log(TracingLevel.WARN, "mpv is not connected; command dropped.");
-                NotifyLaunched(); // mpv may have started without us seeing a launch event: make an idle session look
+                NotifyLaunched(); // mpv may have started without us seeing a launch event.
                 return false;
             }
 

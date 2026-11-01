@@ -7,7 +7,7 @@
     <AssemblyName>com.jkommer.mpv</AssemblyName>
     <OutputPath>bin\$(Configuration)\com.jkommer.mpv.sdPlugin\</OutputPath>
     <AppendTargetFrameworkToOutputPath>False</AppendTargetFrameworkToOutputPath>
-    <ApplicationIcon>Images\mpv.ico</ApplicationIcon>
+    <ApplicationIcon>Images\plugin\mpv.ico</ApplicationIcon>
   </PropertyGroup>
 
   <ItemGroup>
