@@ -2,14 +2,29 @@ using BarRaider.SdTools;
 
 namespace MpvStreamDeckController.Actions
 {
+    /// <summary>What a key shows.</summary>
+    /// <param name="State">Index into the action's <c>States</c> in manifest.json.</param>
+    /// <param name="Title">Text drawn on the key, for all states.</param>
+    public readonly record struct KeyFeedback(uint? State = null, string? Title = null);
+
     public abstract class MpvKeyAction : KeypadBase
     {
+        private readonly MpvStateSubscription<KeyFeedback>? _stateSubscription;
+
+        protected MpvKeyAction(ISDConnection connection, InitialPayload payload, IReadOnlyCollection<MpvProperty>? observedProperties = null)
+            : base(connection, payload)
+        {
+            MpvLaunchHook.EnsureAttached(connection); 
+
+            if (observedProperties is { Count: > 0 })
+            {
+                _stateSubscription = new MpvStateSubscription<KeyFeedback>(observedProperties, GetFeedback, OnFeedbackChanged);
+            }
+        }
+
         protected abstract object[]? Command { get; }
 
-        protected MpvKeyAction(ISDConnection connection, InitialPayload payload) : base(connection, payload)
-        {
-            MpvLaunchHook.EnsureAttached(connection);
-        }
+        protected virtual KeyFeedback GetFeedback(MpvState state) => default;
 
         public override async void KeyPressed(KeyPayload payload)
         {
@@ -17,10 +32,15 @@ namespace MpvStreamDeckController.Actions
             {
                 var command = Command;
 
-                if (command is null || !await MpvCommand.SendCommandAsync(command))
+                if (command is not null && await MpvCommand.SendCommandAsync(command))
                 {
-                    await Connection.ShowAlert();
+                    return;
                 }
+
+                await Connection.ShowAlert();
+
+                // Stream Deck flips a multi-state key on every press whether or not anything happened, so put the key back to what mpv actually shows.
+                _stateSubscription?.ReapplyFeedback();
             }
             catch (Exception ex)
             {
@@ -32,9 +52,37 @@ namespace MpvStreamDeckController.Actions
         public override void OnTick() { }
         public override void ReceivedGlobalSettings(ReceivedGlobalSettingsPayload payload) { }
         public override void ReceivedSettings(ReceivedSettingsPayload payload) { }
-        public override void Dispose()
+
+        private void OnFeedbackChanged(KeyFeedback feedback)
         {
-            GC.SuppressFinalize(this);
+            if (feedback.State is null && feedback.Title is null)
+            {
+                return;
+            }
+
+            _ = SetFeedbackAsync(feedback);
         }
+
+        private async Task SetFeedbackAsync(KeyFeedback feedback)
+        {
+            try
+            {
+                if (feedback.State is { } state)
+                {
+                    await Connection.SetStateAsync(state);
+                }
+
+                if (feedback.Title is not null)
+                {
+                    await Connection.SetTitleAsync(feedback.Title);
+                }
+            }
+            catch (Exception ex)
+            {
+                LogHelper.Log(TracingLevel.ERROR, $"Updating key failed: {ex.Message}");
+            }
+        }
+
+        public override void Dispose() => _stateSubscription?.Dispose();
     }
 }
