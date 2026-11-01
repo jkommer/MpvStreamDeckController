@@ -8,7 +8,7 @@ on:
  
 env:
   PLUGIN_ID: com.jkommer.mpv
-  PLUGIN_DIR: bin/Release/com.jkommer.mpv.sdPlugin
+  PLUGIN_DIR: src/MpvStreamDeckController/bin/Release/com.jkommer.mpv.sdPlugin
  
 jobs:
   build: 
