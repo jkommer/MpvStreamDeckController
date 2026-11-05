@@ -2,4 +2,7 @@
   <Folder Name="/src/">
     <Project Path="src/MpvStreamDeckController/MpvStreamDeckController.csproj" />
   </Folder>
+  <Folder Name="/tests/">
+    <Project Path="tests/MpvStreamDeckController.Tests/MpvStreamDeckController.Tests.csproj" />
+  </Folder>
 </Solution>

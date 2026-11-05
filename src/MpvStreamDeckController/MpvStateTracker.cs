@@ -9,7 +9,7 @@ namespace MpvStreamDeckController
     /// Keeps track of property values producing a new immuntable <see cref="MpvState"/> when changes have occurred and raises <see cref="StateChanged"/>.
     /// </summary>
     /// <param name="observedPropertiesChanged">Called whenever the set of observed properties may have changed. Used to communicate the (un-)observed properties to mpv</param>
-    internal sealed class MpvStateTracker(Action observedPropertiesChanged)
+    public sealed class MpvStateTracker(Action observedPropertiesChanged)
     {
         private readonly Action _observedPropertiesChanged = observedPropertiesChanged;
 
@@ -38,7 +38,7 @@ namespace MpvStreamDeckController
         /// </summary>
         /// <param name="properties"></param>
         /// <returns></returns>
-        public IDisposable ObserveProperty(IReadOnlyCollection<MpvProperty> properties)
+        public IDisposable ObserveProperty(IEnumerable<MpvProperty> properties)
         {
             lock (_stateLock)
             {
@@ -60,7 +60,7 @@ namespace MpvStreamDeckController
             }
         }
 
-        private void UpdateReferenceCounts(IReadOnlyCollection<MpvProperty> properties)
+        private void UpdateReferenceCounts(IEnumerable<MpvProperty> properties)
         {
             lock (_stateLock)
             {
