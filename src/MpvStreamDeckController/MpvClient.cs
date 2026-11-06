@@ -171,7 +171,6 @@ namespace MpvStreamDeckController
             return true;
         }
 
-
         /// <summary>
         /// Sends a JSON IPC command. 
         /// </summary>

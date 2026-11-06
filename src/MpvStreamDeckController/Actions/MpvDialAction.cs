@@ -29,14 +29,49 @@ public abstract class MpvDialAction : KeyAndEncoderBase
         }
     }
 
-    protected abstract object[] RotateCommand(int ticks);
-    protected abstract object[] PressCommand { get; }
+    protected abstract object[][] RotateCommands(int ticks);
+    protected abstract object[][] PressCommands { get; }
     protected abstract DialFeedback GetFeedback(MpvState state);
 
-    public override void DialRotate(DialRotatePayload payload) => _ = MpvClient.Instance.SendAsync(RotateCommand(payload.Ticks));
-    public override void DialDown(DialPayload payload) => _ = MpvClient.Instance.SendAsync(PressCommand);
+    public override async void DialRotate(DialRotatePayload payload)
+    {
+        var rotateCommands = RotateCommands(payload.Ticks);
+
+        if (rotateCommands is not null)
+        {
+            foreach (var command in rotateCommands)
+            {
+                await MpvClient.Instance.SendAsync(command);
+            }
+        }
+    }
+
+    public override async void DialDown(DialPayload payload)
+    {
+        if (PressCommands is not null)
+        {
+            foreach (var command in PressCommands)
+            {
+                await MpvClient.Instance.SendAsync(command);
+            }
+
+            return;
+        }
+    }
     public override void DialUp(DialPayload payload) { }
-    public override void TouchPress(TouchpadPressPayload payload) => _ = MpvClient.Instance.SendAsync(PressCommand);
+
+    public override async void TouchPress(TouchpadPressPayload payload)
+    {
+        if (PressCommands is not null)
+        {
+            foreach (var command in PressCommands)
+            {
+                await MpvClient.Instance.SendAsync(command);
+            }
+
+            return;
+        }
+    }
 
     public override void KeyPressed(KeyPayload payload) { }
     public override void KeyReleased(KeyPayload payload) { }

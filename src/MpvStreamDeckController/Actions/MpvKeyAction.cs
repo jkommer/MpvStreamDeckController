@@ -22,7 +22,7 @@ public abstract class MpvKeyAction : KeypadBase
         }
     }
 
-    protected abstract object[]? Command { get; }
+    protected abstract object[][]? Commands { get; }
 
     protected virtual KeyFeedback GetFeedback(MpvState state) => default;
 
@@ -30,10 +30,15 @@ public abstract class MpvKeyAction : KeypadBase
     {
         try
         {
-            var command = Command;
+            var commands = Commands;
 
-            if (command is not null && await MpvClient.Instance.SendAsync(command))
+            if (commands is not null)
             {
+                foreach (var command in commands)
+                {
+                    await MpvClient.Instance.SendAsync(command);
+                }
+
                 return;
             }
 
