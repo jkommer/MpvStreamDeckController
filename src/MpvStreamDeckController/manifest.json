@@ -122,7 +122,6 @@
             "Icon": "Images/dial/09_seek_dial",
             "Name": "Seek",
             "Controllers": [
-                "Keypad",
                 "Encoder"
             ],
             "Encoder": {
