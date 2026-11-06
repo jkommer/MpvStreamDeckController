@@ -141,30 +141,46 @@
             "UUID": "com.jkommer.mpv.seek"
         },
         {
-        "Icon": "Images/dial/11a_volume_dial",
-        "Name": "Volume",
-        "Tooltip": "Rotate to change mpv's volume, press to mute",
-        "Controllers": [
-            "Encoder"
-        ],
-        "Encoder": {
-            "layout": "$B1",
-            "TriggerDescription": {
-            "Push": "Mute / Unmute",
-            "Rotate": "Volume",
-            "Touch": "Mute / Unmute"
-            }
+            "Name": "Custom Command",
+            "UUID": "com.jkommer.mpv.customcommand",
+            "Tooltip": "Send any mpv command",
+            "Icon": "Images/key/10_custom_command",
+            "PropertyInspectorPath": "PropertyInspectors/CustomCommand.html",
+            "Controllers": [
+                "Keypad"
+            ],
+            "States": [
+                {
+                    "Image": "Images/key/10_custom_command",
+                    "TitleAlignment": "middle"
+                }
+            ]
         },
-        "States": [
-            {
-            "Image": "Images/dial/11a_volume_dial"
+        {
+            "Icon": "Images/dial/11a_volume_dial",
+            "Name": "Volume",
+            "Tooltip": "Rotate to change mpv's volume, press to mute",
+            "Controllers": [
+                "Encoder"
+            ],
+            "Encoder": {
+                "layout": "$B1",
+                "TriggerDescription": {
+                    "Push": "Mute / Unmute",
+                    "Rotate": "Volume",
+                    "Touch": "Mute / Unmute"
+                }
             },
-            {
-            "Image": "Images/dial/11b_volume_muted_dial"
-            }
-        ],
-        "UUID": "com.jkommer.mpv.volume"
-        }        
+            "States": [
+                {
+                    "Image": "Images/dial/11a_volume_dial"
+                },
+                {
+                    "Image": "Images/dial/11b_volume_muted_dial"
+                }
+            ],
+            "UUID": "com.jkommer.mpv.volume"
+        }
     ],
     "$schema": "https://schemas.elgato.com/streamdeck/plugins/manifest.json",
     "UUID": "com.jkommer.mpv",
