@@ -34,7 +34,7 @@ namespace MpvStreamDeckController
         /// <summary>
         /// Property names that are currently being observed.
         /// </summary>
-        private readonly HashSet<string> _registeredObservedProperties = new();
+        private readonly HashSet<string> _registeredObservedProperties = [];
 
 
         public MpvClient(Connector connector, MpvClientOptions? options = null)
@@ -120,7 +120,7 @@ namespace MpvStreamDeckController
             using (stream)
             {
                 // connected, so any pending launch signal has served its purpose
-                _connectRequested.Wait(0); 
+                _connectRequested.Wait(0, token); 
 
                 try
                 {
