@@ -89,6 +89,7 @@ try {
 
     Invoke-Checked 'dotnet clean' { dotnet clean }
     Invoke-Checked 'dotnet build -c Release' { dotnet build -c Release "-p:Version=$($version.SemVer)" }
+    Invoke-Checked 'dotnet test' { dotnet test -c Release --no-build --verbosity normal }
 
     Write-Step "pushd $PluginDir"
     if (-not (Test-Path $PluginDir)) { Fail "Plugin output folder not found: $PluginDir" }
