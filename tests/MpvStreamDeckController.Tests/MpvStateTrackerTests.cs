@@ -1,4 +1,5 @@
 ﻿using Shouldly;
+using System.Text.Json;
 
 namespace MpvStreamDeckController.Tests
 {
@@ -230,6 +231,32 @@ namespace MpvStreamDeckController.Tests
             stateTracker.RegisterPropertyChange(MpvProperties.All.Keys.Max() + 1, "lipsum");
 
             invocations.ShouldBe(0);
+        }
+
+        [Theory]
+        [InlineData(true)]
+        [InlineData(false)]
+        public void RegisterPropertyChange_WhenJsonPropertyWithFromJsonSet_RaisesEventAndProvidesCorrectValue(bool stateValue)
+        {
+            // ACompressor is awkward - make sure we don't break it's response. 
+            var response = JsonElement.Parse($$"""[{ "name":"acompressor","label":"acompressor","enabled":{{stateValue.ToString().ToLower()}},"params":{ "makeup":"8dB","attack":"20","release":"250","threshold":"-25dB","ratio":"3","knee":"2dB"} }]""");
+            bool? stateResult = null;
+
+            var stateTracker = new MpvStateTracker(() => { });
+            var invocations = 0;
+
+            stateTracker.StateChanged += state =>
+            {
+                invocations++;
+                stateResult = state.Flag(MpvProperties.ACompressor);
+
+            };
+
+            stateTracker.ObserveProperty([MpvProperties.ACompressor]);
+            stateTracker.RegisterPropertyChange(MpvProperties.ACompressor.Id, response);
+
+            invocations.ShouldBe(1);
+            stateResult.ShouldBe(stateValue);
         }
     }
 }
