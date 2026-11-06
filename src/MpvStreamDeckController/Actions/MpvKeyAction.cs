@@ -32,7 +32,7 @@ namespace MpvStreamDeckController.Actions
             {
                 var command = Command;
 
-                if (command is not null && await MpvCommand.SendCommandAsync(command))
+                if (command is not null && await MpvClient.Instance.SendAsync(command))
                 {
                     return;
                 }

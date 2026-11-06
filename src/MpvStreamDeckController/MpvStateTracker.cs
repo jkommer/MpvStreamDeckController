@@ -152,20 +152,19 @@ namespace MpvStreamDeckController
                 }
 
                 // Verify the value has changed before we inform the observers. 
+                _observedPropertyValues.TryGetValue(property.Id, out var old);
+
+                if (Equals(old, value))
+                {
+                    return;
+                }
+
                 if (value is null)
                 {
-                    if (!_observedPropertyValues.Remove(property.Id))
-                    {
-                        return;
-                    }
+                    _observedPropertyValues.Remove(property.Id);
                 }
                 else
                 {
-                    if (_observedPropertyValues.TryGetValue(property.Id, out var old) && Equals(old, value))
-                    {
-                        return;
-                    }
-
                     _observedPropertyValues[property.Id] = value;
                 }
 

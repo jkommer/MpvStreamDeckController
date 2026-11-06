@@ -18,7 +18,7 @@ namespace MpvStreamDeckController
         public static void EnsureAttached(ISDConnection connection)
         {
             if (Interlocked.Exchange(ref _attached, 1) == 0)
-                connection.StreamDeckConnection.OnApplicationDidLaunch += (_, _) => MpvCommand.NotifyApplicationLaunched();
+                connection.StreamDeckConnection.OnApplicationDidLaunch += (_, _) => MpvClient.Instance.NotifyMpvLaunched();
         }
     }
 }

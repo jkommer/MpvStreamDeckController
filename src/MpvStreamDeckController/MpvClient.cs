@@ -1,4 +1,6 @@
 using BarRaider.SdTools;
+using System.IO.Pipes;
+using System.Reflection.Metadata;
 using System.Text;
 
 namespace MpvStreamDeckController
@@ -12,6 +14,8 @@ namespace MpvStreamDeckController
 
     public class MpvClient
     {
+        private const string PipeName = "mpvsocket";
+
         /// <summary>Opens a duplex connection to mpv. Return null if mpv is unreachable; throw only on cancellation.</summary>
         public delegate Task<Stream?> Connector(TimeSpan timeout, CancellationToken token);
 
@@ -19,7 +23,6 @@ namespace MpvStreamDeckController
         private readonly MpvClientOptions _options;
         private readonly MpvStateTracker _stateTracker;
 
-        
         private readonly SemaphoreSlim _writeLock = new(1, 1);
         private readonly SemaphoreSlim _connectRequested = new(0, 1);
         private readonly CancellationTokenSource _cancellationTokenSource = new();
@@ -45,6 +48,25 @@ namespace MpvStreamDeckController
 
             _ = Task.Run(() => KeepConnectedAsync(_cancellationTokenSource.Token));
         }
+
+        public static MpvClient Instance { get; } = new MpvClient(ConnectPipeAsync);
+
+        private static async Task<Stream?> ConnectPipeAsync(TimeSpan timeout, CancellationToken token)
+        {
+            var pipe = new NamedPipeClientStream(".", PipeName, PipeDirection.InOut, PipeOptions.Asynchronous);
+
+            try
+            {
+                await pipe.ConnectAsync((int)timeout.TotalMilliseconds, token);
+                return pipe;
+            }
+            catch (Exception)
+            {
+                pipe.Dispose();
+                token.ThrowIfCancellationRequested();
+                return null;
+            }
+        }        
 
         public event Action<MpvState>? StateChanged
         {
@@ -164,7 +186,7 @@ namespace MpvStreamDeckController
             if (pipe is null)
             {
                 LogHelper.Log(TracingLevel.WARN, "mpv is not connected; command dropped.");
-                NotifyLaunched(); // mpv may have started without us seeing a launch event.
+                NotifyMpvLaunched(); // mpv may have started without us seeing a launch event.
                 return false;
             }
 
@@ -186,7 +208,7 @@ namespace MpvStreamDeckController
             }
         }
 
-        public void NotifyLaunched()
+        public void NotifyMpvLaunched()
         {
             try { _connectRequested.Release(); }
             catch (SemaphoreFullException) { }

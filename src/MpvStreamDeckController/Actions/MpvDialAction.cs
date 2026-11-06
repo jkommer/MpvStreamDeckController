@@ -33,10 +33,10 @@ namespace MpvStreamDeckController.Actions
         protected abstract object[] PressCommand { get; }
         protected abstract DialFeedback GetFeedback(MpvState state);
 
-        public override void DialRotate(DialRotatePayload payload) => _ = MpvCommand.SendCommandAsync(RotateCommand(payload.Ticks));
-        public override void DialDown(DialPayload payload) => _ = MpvCommand.SendCommandAsync(PressCommand);
+        public override void DialRotate(DialRotatePayload payload) => _ = MpvClient.Instance.SendAsync(RotateCommand(payload.Ticks));
+        public override void DialDown(DialPayload payload) => _ = MpvClient.Instance.SendAsync(PressCommand);
         public override void DialUp(DialPayload payload) { }
-        public override void TouchPress(TouchpadPressPayload payload) => _ = MpvCommand.SendCommandAsync(PressCommand);
+        public override void TouchPress(TouchpadPressPayload payload) => _ = MpvClient.Instance.SendAsync(PressCommand);
 
         public override void KeyPressed(KeyPayload payload) { }
         public override void KeyReleased(KeyPayload payload) { }
