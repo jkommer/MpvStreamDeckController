@@ -1,18 +1,17 @@
 using BarRaider.SdTools;
 
-namespace MpvStreamDeckController
+namespace MpvStreamDeckController;
+
+public static class LogHelper
 {
-    public static class LogHelper
+    public static void Log(TracingLevel level, string message)
     {
-        public static void Log(TracingLevel level, string message)
+        try
         {
-            try
-            {
-                Logger.Instance.LogMessage(level, message);
-            }
-            catch
-            {
-            }
+            Logger.Instance.LogMessage(level, message);
+        }
+        catch
+        {
         }
     }
 }

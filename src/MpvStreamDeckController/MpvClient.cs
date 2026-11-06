@@ -1,6 +1,5 @@
 using BarRaider.SdTools;
 using System.IO.Pipes;
-using System.Reflection.Metadata;
 using System.Text;
 
 namespace MpvStreamDeckController
@@ -38,7 +37,6 @@ namespace MpvStreamDeckController
         /// Property names that are currently being observed.
         /// </summary>
         private readonly HashSet<string> _registeredObservedProperties = [];
-
 
         public MpvClient(Connector connector, MpvClientOptions? options = null)
         {

@@ -21,8 +21,10 @@
       <None Update="Images/**/*">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </None>
+    <None Update="PropertyInspectors\**">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>    
   </ItemGroup>
-
 
   <Target Name="PostClean" AfterTargets="Clean">
     <RemoveDir Directories="$(BaseOutputPath)" />
