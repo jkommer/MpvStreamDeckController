@@ -5,9 +5,9 @@ namespace MpvStreamDeckController.Actions;
 [PluginActionId("com.jkommer.mpv.seek")]
 public class SeekAction(ISDConnection connection, InitialPayload payload) : MpvDialAction(connection, payload, [MpvProperties.TimePos, MpvProperties.Duration])
 {
-    protected override object[][] RotateCommands(int ticks) => [["seek", ticks, "relative"]];
+    protected override MpvCommand[] RotateCommands(int ticks) => [new("seek", ticks, "relative")];
 
-    protected override object[][] PressCommands => [["cycle", "pause"]];
+    protected override MpvCommand[] PressCommands => [new("cycle", "pause")];
 
     protected override DialFeedback GetFeedback(MpvState state)
     {

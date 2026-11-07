@@ -5,5 +5,5 @@ namespace MpvStreamDeckController.Actions;
 [PluginActionId("com.jkommer.mpv.cycleaudio")]
 public class CycleAudioAction(ISDConnection connection, InitialPayload payload) : MpvKeyAction(connection, payload)
 {
-    protected override object[][] Commands { get; } = [["cycle", "audio"]];
+    protected override MpvCommand[] Commands { get; } = [new("cycle", "audio")];
 }

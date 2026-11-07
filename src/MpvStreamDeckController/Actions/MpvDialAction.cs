@@ -29,55 +29,24 @@ public abstract class MpvDialAction : KeyAndEncoderBase
         }
     }
 
-    protected abstract object[][] RotateCommands(int ticks);
-    protected abstract object[][] PressCommands { get; }
+    protected abstract MpvCommand[] RotateCommands(int ticks);
+    protected abstract MpvCommand[] PressCommands { get; }
     protected abstract DialFeedback GetFeedback(MpvState state);
 
-    public override async void DialRotate(DialRotatePayload payload)
-    {
-        var rotateCommands = RotateCommands(payload.Ticks);
-
-        if (rotateCommands is not null)
-        {
-            foreach (var command in rotateCommands)
-            {
-                await MpvClient.Instance.SendAsync(command);
-            }
-        }
-    }
-
-    public override async void DialDown(DialPayload payload)
-    {
-        if (PressCommands is not null)
-        {
-            foreach (var command in PressCommands)
-            {
-                await MpvClient.Instance.SendAsync(command);
-            }
-
-            return;
-        }
-    }
+    public override void DialRotate(DialRotatePayload payload) => _ = Connection.SendCommandsAsync(RotateCommands(payload.Ticks));
+    public override void DialDown(DialPayload payload) => _ = Connection.SendCommandsAsync(PressCommands);
     public override void DialUp(DialPayload payload) { }
 
-    public override async void TouchPress(TouchpadPressPayload payload)
-    {
-        if (PressCommands is not null)
-        {
-            foreach (var command in PressCommands)
-            {
-                await MpvClient.Instance.SendAsync(command);
-            }
-
-            return;
-        }
-    }
-
+    public override void TouchPress(TouchpadPressPayload payload) => _ = Connection.SendCommandsAsync(PressCommands);
+    
     public override void KeyPressed(KeyPayload payload) { }
     public override void KeyReleased(KeyPayload payload) { }
+    
     public override void OnTick() { }
+    
     public override void ReceivedGlobalSettings(ReceivedGlobalSettingsPayload payload) { }
     public override void ReceivedSettings(ReceivedSettingsPayload payload) { }
+    
     private void OnFeedbackChanged(DialFeedback feedback) => _ = SetFeedbackAsync(feedback);
 
     private async Task SetFeedbackAsync(DialFeedback feedback)

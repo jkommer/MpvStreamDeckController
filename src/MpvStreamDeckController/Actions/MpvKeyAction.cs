@@ -22,34 +22,11 @@ public abstract class MpvKeyAction : KeypadBase
         }
     }
 
-    protected abstract object[][]? Commands { get; }
+    protected abstract MpvCommand[]? Commands { get; }
 
     protected virtual KeyFeedback GetFeedback(MpvState state) => default;
 
-    public override async void KeyPressed(KeyPayload payload)
-    {
-        try
-        {
-            var commands = Commands;
-
-            if (commands is not null)
-            {
-                foreach (var command in commands)
-                {
-                    await MpvClient.Instance.SendAsync(command);
-                }
-
-                return;
-            }
-
-            await Connection.ShowAlert();
-        }
-        catch (Exception ex)
-        {
-            LogHelper.Log(TracingLevel.ERROR, $"KeyPressed failed: {ex.Message}");
-        }
-    }
-
+    public override void KeyPressed(KeyPayload payload) => _ = Connection.SendCommandsAsync(Commands);
     public override void KeyReleased(KeyPayload payload) { }
     public override void OnTick() { }
     public override void ReceivedGlobalSettings(ReceivedGlobalSettingsPayload payload) { }

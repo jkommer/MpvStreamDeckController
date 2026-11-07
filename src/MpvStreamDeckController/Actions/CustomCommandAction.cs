@@ -11,9 +11,9 @@ public class CustomCommandAction : MpvKeyAction
         [JsonProperty("command")]
         public string Command { get; set; } = string.Empty;
     }
-    private volatile object[][]? _commands;
+    private volatile MpvCommand[]? _commands;
 
-    protected override object[][]? Commands => _commands;
+    protected override MpvCommand[]? Commands => _commands;
 
     public CustomCommandAction(ISDConnection connection, InitialPayload payload) : base(connection, payload)
     {

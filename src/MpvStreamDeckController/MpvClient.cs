@@ -4,6 +4,11 @@ using System.Text;
 
 namespace MpvStreamDeckController
 {
+    public record MpvCommand(params object[] Components)
+    {
+        public static implicit operator MpvCommand(object[] args) => new(args);
+    }
+
     public record MpvClientOptions
     {
         public TimeSpan ConnectionTimeout { get; init; } = TimeSpan.FromMilliseconds(500);
@@ -172,11 +177,33 @@ namespace MpvStreamDeckController
         }
 
         /// <summary>
+        /// Send multiple JSON IPC commands.
+        /// </summary>
+        /// <param name="commands"></param>
+        /// <returns>Returns false (and logs) if mpv is not connected or the write fails.</returns>
+        public async Task<bool> SendAllAsync(IEnumerable<MpvCommand>? commands)
+        {
+            if (commands is null)
+            {
+                return false;
+            }
+
+            var isSuccessful = true;
+
+            foreach (var command in commands)
+            {
+                isSuccessful &= await SendAsync(command);
+            }
+
+            return isSuccessful;
+        }
+
+        /// <summary>
         /// Sends a JSON IPC command. 
         /// </summary>
         /// <param name="command"></param>
         /// <returns>Returns false (and logs) if mpv is not connected or the write fails.</returns>
-        public async Task<bool> SendAsync(object[] command)
+        public async Task<bool> SendAsync(MpvCommand command)
         {
             var pipe = _mpvStream;
 

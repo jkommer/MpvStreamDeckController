@@ -13,9 +13,9 @@ public class VolumeAction(ISDConnection connection, InitialPayload payload) : Mp
     private const string MutedIcon = "Images/dial/11b_volume_muted_dial";
 
     // mpv clamps "add volume" to [0, volume-max], so no range handling is needed here.
-    protected override object[][] RotateCommands(int ticks) => [["add", "volume", ticks * PercentPerTick]];
+    protected override MpvCommand[] RotateCommands(int ticks) => [new("add", "volume", ticks * PercentPerTick)];
 
-    protected override object[][] PressCommands => [["cycle", "mute"]];
+    protected override MpvCommand[] PressCommands => [new("cycle", "mute")];
 
     protected override DialFeedback GetFeedback(MpvState state)
     {

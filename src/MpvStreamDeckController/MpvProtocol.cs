@@ -7,16 +7,16 @@ namespace MpvStreamDeckController;
 /// </summary>
 public static class MpvProtocol
 {
-    public static string BuildCommand(object[] command, int? requestId = null)
+    public static string BuildCommand(MpvCommand command, int? requestId = null)
         => requestId is { } id
-            ? JsonSerializer.Serialize(new { command, request_id = id }) + "\n"
-            : JsonSerializer.Serialize(new { command }) + "\n";
+            ? JsonSerializer.Serialize(new { command = command.Components, request_id = id }) + "\n"
+            : JsonSerializer.Serialize(new { command = command.Components }) + "\n";
 
     public static string BuildObserveProperty(int id, string property)
-        => BuildCommand(["observe_property", id, property]);
+        => BuildCommand(new("observe_property", id, property));
 
     public static string BuildUnobserveProperty(int id)
-        => BuildCommand(["unobserve_property", id]);
+        => BuildCommand(new("unobserve_property", id));
 
     /// <summary>
     /// Parses a <c>property-change</c> event line; false for anything else (replies, other events, garbage).
