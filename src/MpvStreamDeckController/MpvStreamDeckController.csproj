@@ -30,4 +30,11 @@
     <RemoveDir Directories="$(BaseOutputPath)" />
     <RemoveDir Directories="$(BaseIntermediateOutputPath)" />
   </Target>
+
+  <!-- Get rid of SkiaSharp pdbs which get pulled in from StreamDeck-Tools; can do without the  200+MB! -->
+  <Target Name="ExcludePackagePdbs" AfterTargets="ResolveReferences">
+    <ItemGroup>
+      <ReferenceCopyLocalPaths Remove="@(ReferenceCopyLocalPaths)" Condition="'%(Extension)' == '.pdb'" />
+    </ItemGroup>
+  </Target>
 </Project>
