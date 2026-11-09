@@ -15,9 +15,23 @@
     <sdpi-item label="Command">
         <sdpi-textfield setting="command" placeholder="cycle pause"></sdpi-textfield>
     </sdpi-item>
+    <sdpi-item label="Properties">
+        <sdpi-checkbox setting="expandProperties" label="Expand ${property}"></sdpi-checkbox>
+    </sdpi-item>
+    <sdpi-item label="OSD">
+        <sdpi-select setting="osd" default="">
+            <option value="">None (mpv default)</option>
+            <option value="osd-auto">Auto</option>
+            <option value="no-osd">Off</option>
+            <option value="osd-bar">Bar</option>
+            <option value="osd-msg">Message</option>
+            <option value="osd-msg-bar">Message and bar</option>
+        </sdpi-select>
+    </sdpi-item>
     <details>
         <summary>Syntax and examples</summary>
         <p>Same format as an mpv <code>input.conf</code> line. Use double quotes for arguments containing spaces.</p>
+        <p>Unlike <code>input.conf</code>, <code>${property}</code> is only expanded when "Expand" is ticked, and nothing is shown on the OSD unless an OSD mode is chosen. Prefixes typed in the command (e.g. raw, osd-msg) override both.</p>
         <p>
             <code>cycle pause</code><br />
             <code>seek 30 relative</code><br />

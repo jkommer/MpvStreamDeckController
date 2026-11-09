@@ -8,9 +8,33 @@ namespace MpvStreamDeckController;
 public static class MpvProtocol
 {
     public static string BuildCommand(MpvCommand command, int? requestId = null)
-        => requestId is { } id
-            ? JsonSerializer.Serialize(new { command = command.Components, request_id = id }) + "\n"
-            : JsonSerializer.Serialize(new { command = command.Components }) + "\n";
+    {
+        var components = WithInputPrefixes(command);
+
+        return requestId is { } id
+            ? JsonSerializer.Serialize(new { command = components, request_id = id }) + "\n"
+            : JsonSerializer.Serialize(new { command = components }) + "\n";
+    }
+
+    /// <summary>
+    /// Apply input prefixes, if any: see https://mpv.io/manual/stable/#input-command-prefixes
+    /// </summary>
+    private static object[] WithInputPrefixes(MpvCommand command)
+    {
+        var prefixes = new List<object>(2);
+
+        if (command.Osd is { } osd)
+        {
+            prefixes.Add(osd.Prefix);
+        }
+
+        if (command.ExpandProperties)
+        {
+            prefixes.Add("expand-properties");
+        }
+
+        return prefixes.Count == 0 ? command.Components : [.. prefixes, .. command.Components];
+    }
 
     public static string BuildObserveProperty(int id, string property)
         => BuildCommand(new("observe_property", id, property));

@@ -12,6 +12,7 @@
             ],
             "SupportedInMultiActions": true,
             "Tooltip": "Cycle Audio",
+            "PropertyInspectorPath": "PropertyInspectors/Default.html",
             "UUID": "com.jkommer.mpv.cycleaudio"
         },
         {
@@ -26,6 +27,7 @@
             ],
             "SupportedInMultiActions": true,
             "Tooltip": "Cycle Subtitles",
+            "PropertyInspectorPath": "PropertyInspectors/Default.html",
             "UUID": "com.jkommer.mpv.cyclesubtitle"
         },
         {
@@ -40,6 +42,7 @@
             ],
             "SupportedInMultiActions": true,
             "Tooltip": "Next Chapter",
+            "PropertyInspectorPath": "PropertyInspectors/Default.html",
             "UUID": "com.jkommer.mpv.nextchapter"
         },
         {
@@ -54,6 +57,7 @@
             ],
             "SupportedInMultiActions": true,
             "Tooltip": "Previous Chapter",
+            "PropertyInspectorPath": "PropertyInspectors/Default.html",
             "UUID": "com.jkommer.mpv.previouschapter"
         },
         {
@@ -68,6 +72,7 @@
             ],
             "SupportedInMultiActions": true,
             "Tooltip": "Next Playlist Entry",
+            "PropertyInspectorPath": "PropertyInspectors/Default.html",
             "UUID": "com.jkommer.mpv.nextplaylistentry"
         },
         {
@@ -82,6 +87,7 @@
             ],
             "SupportedInMultiActions": true,
             "Tooltip": "Previous Playlist Entry",
+            "PropertyInspectorPath": "PropertyInspectors/Default.html",
             "UUID": "com.jkommer.mpv.previousplaylistentry"
         },
         {
@@ -96,6 +102,7 @@
             ],
             "SupportedInMultiActions": true,
             "Tooltip": "Play / Pause",
+            "PropertyInspectorPath": "PropertyInspectors/Default.html",
             "UUID": "com.jkommer.mpv.playpause"
         },
         {
@@ -116,6 +123,7 @@
             "DisableAutomaticStates": true,
             "SupportedInMultiActions": true,
             "Tooltip": "Toggle Acompressor",
+            "PropertyInspectorPath": "PropertyInspectors/Default.html",
             "UUID": "com.jkommer.mpv.toggleacompressor"
         },
         {
@@ -137,6 +145,7 @@
                     "Image": "Images/dial/09_seek_dial"
                 }
             ],
+            "PropertyInspectorPath": "PropertyInspectors/Default.html",
             "UUID": "com.jkommer.mpv.seek"
         },
         {
@@ -178,6 +187,7 @@
                     "Image": "Images/dial/11b_volume_muted_dial"
                 }
             ],
+            "PropertyInspectorPath": "PropertyInspectors/Default.html",
             "UUID": "com.jkommer.mpv.volume"
         }
     ],

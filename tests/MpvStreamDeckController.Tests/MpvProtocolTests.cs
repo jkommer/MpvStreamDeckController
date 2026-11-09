@@ -22,6 +22,32 @@ public class MpvProtocolTests
         MpvProtocol.BuildCommand(commands, requestId).ShouldBe(expectedOutput);
     }
 
+    [Theory]
+    [InlineData(false, null, "{\"command\":[\"show-text\",\"${time-pos}\"]}\n")]
+    [InlineData(true, null, "{\"command\":[\"expand-properties\",\"show-text\",\"${time-pos}\"]}\n")]
+    [InlineData(false, "osd-auto", "{\"command\":[\"osd-auto\",\"show-text\",\"${time-pos}\"]}\n")]
+    [InlineData(false, "no-osd", "{\"command\":[\"no-osd\",\"show-text\",\"${time-pos}\"]}\n")]
+    [InlineData(false, "osd-bar", "{\"command\":[\"osd-bar\",\"show-text\",\"${time-pos}\"]}\n")]
+    [InlineData(false, "osd-msg", "{\"command\":[\"osd-msg\",\"show-text\",\"${time-pos}\"]}\n")]
+    [InlineData(true, "osd-msg-bar", "{\"command\":[\"osd-msg-bar\",\"expand-properties\",\"show-text\",\"${time-pos}\"]}\n")]
+    public void BuildCommand_WithPrefixOptions_PrependsPrefixes(bool expandProperties, string? osdPrefix, string expectedOutput)
+    {
+        var osd = osdPrefix is null ? null : MpvOsdMode.All.Single(mode => mode.Prefix == osdPrefix);
+
+        var command = new MpvCommand("show-text", "${time-pos}") { ExpandProperties = expandProperties, Osd = osd };
+
+        MpvProtocol.BuildCommand(command).ShouldBe(expectedOutput);
+    }
+
+    [Fact]
+    public void BuildCommand_WithPrefixOptions_KeepsUserPrefixesAfterOurs()
+    {
+        MpvCommand command = new object[] { "raw", "show-text", "${time-pos}" };
+        command = command with { ExpandProperties = true };
+
+        MpvProtocol.BuildCommand(command).ShouldBe("{\"command\":[\"expand-properties\",\"raw\",\"show-text\",\"${time-pos}\"]}\n");
+    }
+
     [Fact]
     public void BuildObserveProperty_WithProperty_ReturnsCorrectlyFormattedObserveCommand()
     {

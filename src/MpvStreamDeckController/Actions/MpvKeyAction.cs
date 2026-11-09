@@ -10,11 +10,13 @@ public readonly record struct KeyFeedback(uint? State = null, string? Title = nu
 public abstract class MpvKeyAction : KeypadBase
 {
     private readonly MpvStateSubscription<KeyFeedback>? _stateSubscription;
+    private volatile CommonActionSettings _settings;
 
     protected MpvKeyAction(ISDConnection connection, InitialPayload payload, IReadOnlyCollection<MpvProperty>? observedProperties = null)
         : base(connection, payload)
     {
-        MpvLaunchHook.EnsureAttached(connection); 
+        MpvLaunchHook.EnsureAttached(connection);
+        _settings = CommonActionSettings.Read(payload.Settings);
 
         if (observedProperties is { Count: > 0 })
         {
@@ -26,11 +28,11 @@ public abstract class MpvKeyAction : KeypadBase
 
     protected virtual KeyFeedback GetFeedback(MpvState state) => default;
 
-    public override void KeyPressed(KeyPayload payload) => _ = Connection.SendCommandsAsync(Commands);
+    public override void KeyPressed(KeyPayload payload) => _ = Connection.SendCommandsAsync(_settings.Apply(Commands));
     public override void KeyReleased(KeyPayload payload) { }
     public override void OnTick() { }
     public override void ReceivedGlobalSettings(ReceivedGlobalSettingsPayload payload) { }
-    public override void ReceivedSettings(ReceivedSettingsPayload payload) { }
+    public override void ReceivedSettings(ReceivedSettingsPayload payload) => _settings = CommonActionSettings.Read(payload.Settings);
 
     private void OnFeedbackChanged(KeyFeedback feedback)
     {

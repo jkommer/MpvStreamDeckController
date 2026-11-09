@@ -10,6 +10,9 @@ public class CustomCommandAction : MpvKeyAction
     {
         [JsonProperty("command")]
         public string Command { get; set; } = string.Empty;
+
+        [JsonProperty("expandProperties")]
+        public bool ExpandProperties { get; set; }
     }
     private volatile MpvCommand[]? _commands;
 
@@ -21,13 +24,18 @@ public class CustomCommandAction : MpvKeyAction
     }    
 
     public override void ReceivedSettings(ReceivedSettingsPayload payload)
-        => ParseCommand(payload.Settings?.ToObject<CustomCommandSettings>());
+    {
+        base.ReceivedSettings(payload);
+        ParseCommand(payload.Settings?.ToObject<CustomCommandSettings>());
+    }
 
     private void ParseCommand(CustomCommandSettings? settings)
     {
         if (MpvCommandParser.TryParse(settings?.Command, out var result, out var error))
         {
-            _commands = [.. result.Commands.Select(x => x.ToArray())];
+            var expandProperties = settings?.ExpandProperties ?? false;
+
+            _commands = [.. result.Commands.Select(x => new MpvCommand([.. x]) { ExpandProperties = expandProperties })];
         }
         else
         {

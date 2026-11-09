@@ -17,11 +17,13 @@ public abstract class MpvDialAction : KeyAndEncoderBase
     private const string IconKey = "icon";
 
     private readonly MpvStateSubscription<DialFeedback>? _stateSubscription;
+    private volatile CommonActionSettings _settings;
 
     protected MpvDialAction(ISDConnection connection, InitialPayload payload, IReadOnlyCollection<MpvProperty> observedProperties)
         : base(connection, payload)
     {
         MpvLaunchHook.EnsureAttached(connection);
+        _settings = CommonActionSettings.Read(payload.Settings);
 
         if (observedProperties is { Count: > 0 })
         {
@@ -33,11 +35,11 @@ public abstract class MpvDialAction : KeyAndEncoderBase
     protected abstract MpvCommand[] PressCommands { get; }
     protected abstract DialFeedback GetFeedback(MpvState state);
 
-    public override void DialRotate(DialRotatePayload payload) => _ = Connection.SendCommandsAsync(RotateCommands(payload.Ticks));
-    public override void DialDown(DialPayload payload) => _ = Connection.SendCommandsAsync(PressCommands);
+    public override void DialRotate(DialRotatePayload payload) => SendCommands(RotateCommands(payload.Ticks));
+    public override void DialDown(DialPayload payload) => SendCommands(PressCommands);
     public override void DialUp(DialPayload payload) { }
 
-    public override void TouchPress(TouchpadPressPayload payload) => _ = Connection.SendCommandsAsync(PressCommands);
+    public override void TouchPress(TouchpadPressPayload payload) => SendCommands(PressCommands);
     
     public override void KeyPressed(KeyPayload payload) { }
     public override void KeyReleased(KeyPayload payload) { }
@@ -45,7 +47,9 @@ public abstract class MpvDialAction : KeyAndEncoderBase
     public override void OnTick() { }
     
     public override void ReceivedGlobalSettings(ReceivedGlobalSettingsPayload payload) { }
-    public override void ReceivedSettings(ReceivedSettingsPayload payload) { }
+    public override void ReceivedSettings(ReceivedSettingsPayload payload) => _settings = CommonActionSettings.Read(payload.Settings);
+
+    private void SendCommands(MpvCommand[]? commands) => _ = Connection.SendCommandsAsync(_settings.Apply(commands));
     
     private void OnFeedbackChanged(DialFeedback feedback) => _ = SetFeedbackAsync(feedback);
 
