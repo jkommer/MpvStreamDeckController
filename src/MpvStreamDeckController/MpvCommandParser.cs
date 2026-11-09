@@ -115,7 +115,8 @@ public static class MpvCommandParser
     /// </summary>
     private static List<string>? ParseCommand(Cursor cursor)
     {
-        cursor.CommandStart = cursor.Position; 
+        // mpv's ctx->start: set before leading whitespace is stripped.
+        cursor.CommandStart = cursor.Position;
         cursor.SkipWhitespace();
 
         var tokens = new List<string>();
@@ -233,10 +234,13 @@ public static class MpvCommandParser
             return TokenResult.TokenRead;
         }
 
-        // `Xcontent X` : backtick, a delimiter character X, content, then X and a closing backtick. Content is raw. (The "> 1" check on the length of
-        // the remaining command text is copied verbatim from mpv.)
+        // `Xcontent X` : backtick, a delimiter character X, content, then X and a closing backtick. Content is raw.
+        // The "> 1" check mirrors mpv's `ctx->start.len > 1`: ctx->start is the text from where this command began (before its leading whitespace
+        // was stripped) to the end of the input, NOT the text remaining at the current position, so it is nearly always true. This means a lone
+        // trailing backtick (e.g. "foo `") is an unterminated custom quote in mpv, not a plain token.
         if (text.Length - cursor.CommandStart > 1 && cursor.Eat('`'))
         {
+            // mpv reads the delimiter without a bounds check here (it hits the string's terminating NUL) and then fails to find the end quote.
             if (cursor.Position >= text.Length)
             {
                 cursor.Error = $"Unterminated custom quote: ...>{text[start..]}<.";

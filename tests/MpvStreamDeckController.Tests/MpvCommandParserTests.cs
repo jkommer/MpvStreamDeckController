@@ -34,7 +34,26 @@ public class MpvCommandParserTests
         { @"loadfile ""C:\\Videos\\my movie.mkv""", [["loadfile", @"C:\Videos\my movie.mkv"]], null },
         { @"loadfile 'C:\Videos\my movie.mkv'", [["loadfile", @"C:\Videos\my movie.mkv"]], null },
         { @"a""b c""d", [[@"a""b", @"c""d"]], null },
+        { "show-text `!a b!`", [["show-text", "a b"]], null },
+        { "show-text `!a \"b\" \\n c!`", [["show-text", "a \"b\" \\n c"]], null },
+        { "show-text `!a;b#c!`; quit", [["show-text", "a;b#c"], ["quit"]], null },
     };
+
+    [Theory]
+    [InlineData("foo `")] // mpv checks the length from the command start, not the current position, so this opens a custom quote
+    [InlineData("show-text `!abc")]
+    [InlineData("show-text `!")]
+    [InlineData("show-text \"abc")]
+    [InlineData("show-text 'abc")]
+    public void TryParse_UnterminatedQuote_ReturnsFalse(string text)
+    {
+        var isSuccessful = MpvCommandParser.TryParse(text, out var result, out var error);
+
+        isSuccessful.ShouldBeFalse();
+        result.ShouldBeNull();
+        error.ShouldNotBeNull();
+        error.ShouldContain("Unterminated");
+    }
 
     [Theory]
     [MemberData(nameof(TryParse_ValidMpvCommands_AreCorrectlyParsedData))]
