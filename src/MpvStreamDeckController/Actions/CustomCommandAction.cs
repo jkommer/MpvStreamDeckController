@@ -43,7 +43,7 @@ public class CustomCommandAction : MpvKeyAction
 
             if (!string.IsNullOrWhiteSpace(settings?.Command))
             {
-                Logger.Instance.LogMessage(TracingLevel.ERROR, $"Custom command is not valid: {settings.Command}, error: {error}");
+                LogHelper.Log(TracingLevel.ERROR, $"Custom command is not valid: {settings.Command}, error: {error}");
             }
         }
     }        

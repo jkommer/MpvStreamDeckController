@@ -123,12 +123,13 @@
             "DisableAutomaticStates": true,
             "SupportedInMultiActions": true,
             "Tooltip": "Toggle Acompressor",
-            "PropertyInspectorPath": "PropertyInspectors/Default.html",
+            "PropertyInspectorPath": "PropertyInspectors/ACompressor.html",
             "UUID": "com.jkommer.mpv.toggleacompressor"
         },
         {
             "Icon": "Images/dial/09_seek_dial",
             "Name": "Seek",
+            "Tooltip": "Rotate to seek in the currently playing media file, press to pause / play",
             "Controllers": [
                 "Encoder"
             ],
@@ -151,9 +152,7 @@
         {
             "Name": "Custom Command",
             "UUID": "com.jkommer.mpv.customcommand",
-            "Tooltip": "Send any mpv command",
             "Icon": "Images/key/10_custom_command",
-            "PropertyInspectorPath": "PropertyInspectors/CustomCommand.html",
             "Controllers": [
                 "Keypad"
             ],
@@ -162,7 +161,10 @@
                     "Image": "Images/key/10_custom_command",
                     "TitleAlignment": "middle"
                 }
-            ]
+            ],
+            "SupportedInMultiActions": true,
+            "Tooltip": "Send any mpv command",
+            "PropertyInspectorPath": "PropertyInspectors/CustomCommand.html"
         },
         {
             "Icon": "Images/dial/11a_volume_dial",
