@@ -1,7 +1,10 @@
 #requires -Version 5.1
 <#
-  Build, validate, pack and reinstall the com.mpv Stream Deck plugin.
+  Build, validate, pack and reinstall the com.jkommer.mpv Stream Deck plugin.
   Run from anywhere; the script uses its own folder as the project root.
+
+  Stream Deck is restarted from the path of the running instance. If it is not running, the path comes from the
+  STREAMDECK_EXE environment variable, or else the default install location under Program Files.
 #>
 
 $ErrorActionPreference = 'Stop'
@@ -12,7 +15,7 @@ $PluginId        = 'com.jkommer.mpv'
 $PluginDir       = Join-Path $ProjectRoot "src\MpvStreamDeckController\bin\Release\$PluginId.sdPlugin"
 $PackageFile     = Join-Path $PluginDir   "$PluginId.streamDeckPlugin"
 $InstalledDir    = Join-Path $env:APPDATA "Elgato\StreamDeck\Plugins\$PluginId.sdPlugin"
-$StreamDeckExe   = 'C:\Program Files\Elgato\StreamDeck\StreamDeck.exe'
+$StreamDeckExe   = if ($env:STREAMDECK_EXE) { $env:STREAMDECK_EXE } else { Join-Path $env:ProgramFiles 'Elgato\StreamDeck\StreamDeck.exe' }
 $ProcessName     = 'StreamDeck'      
 $TimeoutSec      = 30
 $StartupGraceSec = 5               
@@ -109,7 +112,10 @@ try {
     }
 
     Write-Step 'Stopping Stream Deck'
-    if (Get-Process -Name $ProcessName -ErrorAction SilentlyContinue) {
+    $running = Get-Process -Name $ProcessName -ErrorAction SilentlyContinue | Select-Object -First 1
+    if ($running) {
+        # Restart from wherever it is actually installed. Path can be empty if the process is not accessible.
+        if ($running.Path) { $StreamDeckExe = $running.Path }
         taskkill /F /IM "$ProcessName.exe" | Out-Null
         if (-not (Wait-Until { -not (Get-Process -Name $ProcessName -ErrorAction SilentlyContinue) } $TimeoutSec)) {
             Fail "Stream Deck did not exit within $TimeoutSec seconds"
@@ -121,11 +127,12 @@ try {
 
     Write-Step "Deleting $InstalledDir"
     if (Test-Path $InstalledDir) {
+        # Files can stay locked briefly after Stream Deck exits, so keep retrying until the folder is gone.
         $deleted = Wait-Until {
-            try { Remove-Item $InstalledDir -Recurse -Force -ErrorAction Stop; $true }
-            catch { -not (Test-Path $InstalledDir) -and $false }
+            try { Remove-Item $InstalledDir -Recurse -Force -ErrorAction Stop } catch { }
+            -not (Test-Path $InstalledDir)
         } $TimeoutSec
-        if (Test-Path $InstalledDir) { Fail "Could not delete $InstalledDir (files may be locked)" }
+        if (-not $deleted) { Fail "Could not delete $InstalledDir within $TimeoutSec seconds (files may be locked)" }
     } else {
         Write-Host 'Nothing to delete.'
     }
