@@ -21,12 +21,13 @@ namespace MpvStreamDeckController
 
     public record MpvClientOptions
     {
+        public TimeSpan ShutdownTimeout { get; init; } = TimeSpan.FromSeconds(2);
         public TimeSpan ConnectionTimeout { get; init; } = TimeSpan.FromMilliseconds(500);
         public TimeSpan ConnectionRetryInterval { get; init; } = TimeSpan.FromMilliseconds(250);
         public TimeSpan LaunchRetryWindow { get; init; } = TimeSpan.FromSeconds(10);
     }
 
-    public class MpvClient
+    public sealed class MpvClient : IDisposable
     {
         private const string PipeName = "mpvsocket";
 
@@ -40,8 +41,13 @@ namespace MpvStreamDeckController
         private readonly SemaphoreSlim _writeLock = new(1, 1);
         private readonly SemaphoreSlim _connectRequested = new(0, 1);
         private readonly CancellationTokenSource _cancellationTokenSource = new();
+        private readonly Task _connectionTask;
+        private int _disposed;
 
-        private Stream? _mpvStream;
+        /// <summary>
+        /// The live connection, or null. Written by the connection loop and read by senders on other threads.
+        /// </summary>
+        private volatile Stream? _mpvStream;
         
         /// <summary>
         /// Used to keep track of the stream we registered our observers on. 
@@ -59,10 +65,23 @@ namespace MpvStreamDeckController
             _options = options ?? new MpvClientOptions();
             _stateTracker = new MpvStateTracker(() => _ = SyncObservedPropertiesAsync());
 
-            _ = Task.Run(() => KeepConnectedAsync(_cancellationTokenSource.Token));
+            _connectionTask = Task.Run(() => KeepConnectedAsync(_cancellationTokenSource.Token));
         }
 
-        public static MpvClient Instance { get; } = new MpvClient(ConnectPipeAsync);
+        private static readonly Lazy<MpvClient> LazyInstance = new(() => new MpvClient(ConnectPipeAsync));
+
+        public static MpvClient Instance => LazyInstance.Value;
+
+        /// <summary>
+        /// Disposes <see cref="Instance"/> if it was ever created. Call once when the plugin is shutting down.
+        /// </summary>
+        public static void Shutdown()
+        {
+            if (LazyInstance.IsValueCreated)
+            {
+                LazyInstance.Value.Dispose();
+            }
+        }
 
         private static async Task<Stream?> ConnectPipeAsync(TimeSpan timeout, CancellationToken token)
         {
@@ -304,6 +323,31 @@ namespace MpvStreamDeckController
             }
         }
         
-        public void Dispose() => _cancellationTokenSource.Cancel();
+        public void Dispose()
+        {
+            if (Interlocked.Exchange(ref _disposed, 1) != 0)
+            {
+                return;
+            }
+
+            _cancellationTokenSource.Cancel();
+
+            try
+            {
+                if (!_connectionTask.Wait(_options.ShutdownTimeout))
+                {
+                    LogHelper.Log(TracingLevel.WARN, "mpv connection loop did not stop in time.");
+                    return;
+                }
+            }
+            catch (AggregateException ex)
+            {
+                LogHelper.Log(TracingLevel.ERROR, $"mpv connection loop failed: {ex.InnerException?.Message}");
+            }
+
+            // The semaphores are deliberately not disposed: senders may still be waiting on them, and SemaphoreSlim
+            // only holds an unmanaged handle if AvailableWaitHandle is used, which it is not.
+            _cancellationTokenSource.Dispose();
+        }
     }
 }
