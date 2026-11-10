@@ -3,26 +3,12 @@
   <head lang="en">
     <meta charset="utf-8" />
     <script src="sdpi-components.js"></script>
-    <style>
-      .info {
-      font-size: 12px;
-      font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif, "Apple Color Emoji", "Segoe UI Emoji", "Segoe UI Symbol";
-      color: #9a9a9a;
-      }
-    </style>
-    <script>
-      function goToACompressor()
-      {
-        const { streamDeckClient } = SDPIComponents;
-        streamDeckClient.send('openUrl', {
-          url: 'https://github.com/mpv-player/mpv/blob/master/TOOLS/lua/acompressor.lua'
-        });
-      }
-    </script>
+    <link rel="stylesheet" href="styles.css" />
+    <script src="scripts.js"></script>
   </head>
   <body>
     <div class="info">
-      This action requires the <a href="#" onclick="goToACompressor(); return false;">acompressor.lua</a> script to be used.
+      This action requires the <a href="#" onclick="openUrl('https://github.com/mpv-player/mpv/blob/master/TOOLS/lua/acompressor.lua'); return false;">acompressor.lua</a> script to be used.
     </div>
   </body>
 </html>

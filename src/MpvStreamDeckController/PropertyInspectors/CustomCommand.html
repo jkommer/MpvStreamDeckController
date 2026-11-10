@@ -3,13 +3,8 @@
 <head lang="en">
     <meta charset="utf-8" />
     <script src="sdpi-components.js"></script>
-    <style>
-        details * {
-            font-size: 12px;
-            font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif, "Apple Color Emoji", "Segoe UI Emoji", "Segoe UI Symbol";
-            color: #9a9a9a;
-        }
-    </style>
+    <script src="scripts.js"></script>
+    <link rel="stylesheet" href="styles.css" />
 </head>
 <body>
     <sdpi-item label="Command">
@@ -18,16 +13,7 @@
     <sdpi-item label="Properties">
         <sdpi-checkbox setting="expandProperties" label="Expand ${property}"></sdpi-checkbox>
     </sdpi-item>
-    <sdpi-item label="OSD">
-        <sdpi-select setting="osd" default="">
-            <option value="">None (mpv default)</option>
-            <option value="osd-auto">Auto</option>
-            <option value="no-osd">Off</option>
-            <option value="osd-bar">Bar</option>
-            <option value="osd-msg">Message</option>
-            <option value="osd-msg-bar">Message and bar</option>
-        </sdpi-select>
-    </sdpi-item>
+    <mpv-osd-select></mpv-osd-select>
     <details>
         <summary>Syntax and examples</summary>
         <p>Same format as an mpv <code>input.conf</code> line. Use double quotes for arguments containing spaces.</p>
