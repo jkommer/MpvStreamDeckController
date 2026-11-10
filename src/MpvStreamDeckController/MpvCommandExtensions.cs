@@ -9,14 +9,10 @@ namespace MpvStreamDeckController
         {
             try
             {
-                var localCommands = commands;
-
-                if (await MpvClient.Instance.SendAllAsync(localCommands))
+                if (commands is null || (await MpvClient.Instance.SendAsync(commands)).IsFailure)
                 {
-                    return;
+                    await connection.ShowAlert();
                 }
-
-                await connection.ShowAlert();
             }
             catch (Exception ex)
             {

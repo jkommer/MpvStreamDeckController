@@ -16,14 +16,19 @@ public sealed class MpvStateTracker(Action observedPropertiesChanged)
     private readonly Lock _stateLock = new();
 
     /// <summary>
-    /// Dictionary of observer properties id -> number of observers.
+    /// Dictionary of observed property id -> number of observers.
     /// </summary>
-    private readonly Dictionary<int, int> _observedProperties = [];
+    private readonly Dictionary<long, int> _observedProperties = [];
 
     /// <summary>
-    /// Dictionary of observer properties id -> last observed property value.
+    /// Dictionary of observed property id -> last observed property value.
     /// </summary>
-    private readonly Dictionary<int, object> _observedPropertyValues = [];
+    private readonly Dictionary<long, object> _observedPropertyValues = [];
+
+    /// <summary>
+    /// Dictionary of observed property id -> how many times the property has gone from unobserved to observed.
+    /// </summary>
+    private readonly Dictionary<long, int> _observationGenerations = [];
 
     private bool _isConnected;
     private MpvState _state = MpvState.Inactive;
@@ -44,7 +49,14 @@ public sealed class MpvStateTracker(Action observedPropertiesChanged)
         {
             foreach (var property in properties)
             {
-                _observedProperties[property.Id] = _observedProperties.GetValueOrDefault(property.Id) + 1;
+                var count = _observedProperties.GetValueOrDefault(property.Id);
+
+                if (count == 0)
+                {
+                    _observationGenerations[property.Id] = _observationGenerations.GetValueOrDefault(property.Id) + 1;
+                }
+
+                _observedProperties[property.Id] = count + 1;
             }
         }
 
@@ -52,18 +64,28 @@ public sealed class MpvStateTracker(Action observedPropertiesChanged)
         return new PropertyHandle(() => UpdateReferenceCounts(properties));
     }
 
-    public bool IsPropertyObserved(MpvProperty property)
+    /// <summary>
+    /// Null if the property is not observed. Otherwise a number that changes each time the property goes from
+    /// unobserved to observed. If it differs from the one a property was registered with in mpv, the property was
+    /// dropped and re-added in between: its value was discarded, and mpv only sends a value when it changes, so it
+    /// must be registered again to get the current value.
+    /// </summary>
+    public int? GetObservationGeneration(MpvProperty property)
     {
         lock (_stateLock)
         {
-            return _observedProperties.ContainsKey(property.Id);
+            return _observedProperties.ContainsKey(property.Id) ? _observationGenerations[property.Id] : null;
         }
     }
 
     private void UpdateReferenceCounts(IEnumerable<MpvProperty> properties)
     {
+        MpvState? snapshot = null;
+
         lock (_stateLock)
         {
+            var valuesRemoved = false;
+
             foreach (var property in properties)
             {
                 if (--_observedProperties[property.Id] > 0)
@@ -72,8 +94,19 @@ public sealed class MpvStateTracker(Action observedPropertiesChanged)
                 }
 
                 _observedProperties.Remove(property.Id);
-                _observedPropertyValues.Remove(property.Id);
+                valuesRemoved |= _observedPropertyValues.Remove(property.Id);
             }
+
+            // Publish the removal, so State doesn't keep offering a value nobody is tracking any more.
+            if (valuesRemoved)
+            {
+                snapshot = CreateSnapshot();
+            }
+        }
+
+        if (snapshot is not null)
+        {
+            RaiseStateChange(snapshot);
         }
 
         _observedPropertiesChanged();
@@ -122,9 +155,9 @@ public sealed class MpvStateTracker(Action observedPropertiesChanged)
         RaiseStateChange(snapshot);
     }
 
-    public void RegisterPropertyChange(int id, object? rawValue)
+    public void RegisterPropertyChange(long propertyId, object? rawValue)
     {
-        if (!MpvProperties.All.TryGetValue(id, out var property))
+        if (!MpvProperties.All.TryGetValue(propertyId, out var property))
         {
             return;
         }
@@ -182,7 +215,7 @@ public sealed class MpvStateTracker(Action observedPropertiesChanged)
     /// <returns></returns>
     private MpvState CreateSnapshot()
     {
-        var next = new MpvState(_isConnected, new Dictionary<int, object>(_observedPropertyValues));
+        var next = new MpvState(_state.Version + 1, _isConnected, new Dictionary<long, object>(_observedPropertyValues));
         Volatile.Write(ref _state, next);
         return next;
     }

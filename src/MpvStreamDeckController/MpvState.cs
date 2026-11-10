@@ -5,15 +5,22 @@ namespace MpvStreamDeckController;
 /// </summary>
 public sealed class MpvState
 {
-    private readonly IReadOnlyDictionary<int, object> _values;
+    private readonly IReadOnlyDictionary<long, object> _values;
 
-    internal MpvState(bool isConnected, IReadOnlyDictionary<int, object> values)
+    internal MpvState(long version, bool isConnected, IReadOnlyDictionary<long, object> values)
     {
+        Version = version;
         IsConnected = isConnected;
         _values = values;
     }
 
-    public static MpvState Inactive { get; } = new(false, new Dictionary<int, object>());
+    public static MpvState Inactive { get; } = new(0, false, new Dictionary<long, object>());
+
+    /// <summary>
+    /// Increases with every snapshot. States can be delivered out of order when raised from different threads, so
+    /// subscribers use this to ignore one older than what they already applied.
+    /// </summary>
+    public long Version { get; }
 
     public bool IsConnected { get; }
 

@@ -7,7 +7,7 @@ namespace MpvStreamDeckController;
 /// </summary>
 public static class MpvProtocol
 {
-    public static string BuildCommand(MpvCommand command, int? requestId = null)
+    public static string BuildCommand(MpvCommand command, long? requestId = null)
     {
         var components = WithInputPrefixes(command);
 
@@ -36,24 +36,20 @@ public static class MpvProtocol
         return prefixes.Count == 0 ? command.Components : [.. prefixes, .. command.Components];
     }
 
-    public static string BuildObserveProperty(int id, string property)
+    public static string BuildObserveProperty(long id, string property)
         => BuildCommand(new("observe_property", id, property));
 
-    public static string BuildUnobserveProperty(int id)
+    public static string BuildUnobserveProperty(long id)
         => BuildCommand(new("unobserve_property", id));
 
     /// <summary>
-    /// Parses a <c>property-change</c> event line; false for anything else (replies, other events, garbage).
-    /// <paramref name="value"/> is a double, bool, string, or null when the property is unavailable.
+    /// Parses one line received from mpv: a property-change event, a command reply, or null for anything else.
     /// </summary>
-    public static bool TryParsePropertyChange(string? line, out int id, out object? value)
+    public static MpvMessage? ParseMessage(string? line)
     {
-        id = 0;
-        value = null;
-
         if (string.IsNullOrWhiteSpace(line))
         {
-            return false;
+            return null;
         }
 
         try
@@ -61,21 +57,32 @@ public static class MpvProtocol
             using var document = JsonDocument.Parse(line);
             var root = document.RootElement;
 
-            if (root.ValueKind != JsonValueKind.Object || root.GetPropertyText("event") != "property-change" || !root.TryGetPropertyInt32("id", out id))
+            if (root.ValueKind != JsonValueKind.Object)
             {
-                return false;
+                return null;
             }
 
-            if (root.TryGetProperty("data", out var data))
+            if (root.TryGetProperty("event", out _))
             {
-                value = ToValue(data);
+                if (root.GetPropertyText("event") != "property-change" || !root.TryGetPropertyInt64("id", out var propertyId))
+                {
+                    return null;
+                }
+
+                return new MpvPropertyChange(propertyId, root.TryGetProperty("data", out var data) ? ToValue(data) : null);
             }
 
-            return true;
+            // Replies have no "event"; mpv always includes "error" and copies "request_id" back (0 if none was sent).
+            if (root.TryGetPropertyInt64("request_id", out var requestId) && root.GetPropertyText("error") is { } error)
+            {
+                return new MpvReply(requestId, error);
+            }
+
+            return null;
         }
         catch (JsonException)
         {
-            return false;
+            return null;
         }
     }
 

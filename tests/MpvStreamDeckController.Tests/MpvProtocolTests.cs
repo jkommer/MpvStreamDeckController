@@ -19,7 +19,9 @@ public class MpvProtocolTests
     [InlineData(new object[] { "script-message", "toggle-acompressor" }, 5, "{\"command\":[\"script-message\",\"toggle-acompressor\"],\"request_id\":5}\n")]
     public void BuildCommand_WithValidInput_ReturnsCorrectlyFormattedCommands(object[] commands, int? requestId, string expectedOutput)
     {
-        MpvProtocol.BuildCommand(commands, requestId).ShouldBe(expectedOutput);
+        MpvProtocol
+            .BuildCommand(commands, requestId)
+            .ShouldBe(expectedOutput);
     }
 
     [Theory]
@@ -36,7 +38,9 @@ public class MpvProtocolTests
 
         var command = new MpvCommand("show-text", "${time-pos}") { ExpandProperties = expandProperties, Osd = osd };
 
-        MpvProtocol.BuildCommand(command).ShouldBe(expectedOutput);
+        MpvProtocol
+            .BuildCommand(command)
+            .ShouldBe(expectedOutput);
     }
 
     [Fact]
@@ -45,7 +49,9 @@ public class MpvProtocolTests
         MpvCommand command = new object[] { "raw", "show-text", "${time-pos}" };
         command = command with { ExpandProperties = true };
 
-        MpvProtocol.BuildCommand(command).ShouldBe("{\"command\":[\"expand-properties\",\"raw\",\"show-text\",\"${time-pos}\"]}\n");
+        MpvProtocol
+            .BuildCommand(command)
+            .ShouldBe("{\"command\":[\"expand-properties\",\"raw\",\"show-text\",\"${time-pos}\"]}\n");
     }
 
     [Fact]
@@ -53,7 +59,9 @@ public class MpvProtocolTests
     {
         foreach (var property in MpvProperties.All.Values)
         {
-            MpvProtocol.BuildObserveProperty(property.Id, property.Name).ShouldBe($"{{\"command\":[\"observe_property\",{ property.Id },\"{ property.Name }\"]}}\n");
+            MpvProtocol
+                .BuildObserveProperty(property.Id, property.Name)
+                .ShouldBe($"{{\"command\":[\"observe_property\",{ property.Id },\"{ property.Name }\"]}}\n");
         }
     }
 
@@ -62,155 +70,162 @@ public class MpvProtocolTests
     {
         foreach (var property in MpvProperties.All.Values)
         {
-            MpvProtocol.BuildUnobserveProperty(property.Id).ShouldBe($"{{\"command\":[\"unobserve_property\",{ property.Id }]}}\n");
+            MpvProtocol
+                .BuildUnobserveProperty(property.Id)
+                .ShouldBe($"{{\"command\":[\"unobserve_property\",{ property.Id }]}}\n");
         }
     }
 
-    public static TheoryData<string?> TryParsePropertyChange_WhenLineIsEmptyOrInvalidJson_ShouldReturnFalseData => new()
-    {
-        { (string?) null },
-        { "" },
-        { "   " },
-        { "{" },
-        { "not json" },
-        { "{\"event\": \"property-change\", \"id\": 1" },
-    };
-
-    [Theory]
-    [MemberData(nameof(TryParsePropertyChange_WhenLineIsEmptyOrInvalidJson_ShouldReturnFalseData))]
-    public void TryParsePropertyChange_WhenLineIsEmptyOrInvalidJson_ShouldReturnFalse(string? line)
-    {
-        var result = MpvProtocol.TryParsePropertyChange(line, out var id, out var value);
-
-        result.ShouldBeFalse();
-        id.ShouldBe(0);
-        value.ShouldBeNull();
-    }
-
-    [Fact]
-    public void TryParsePropertyChange_WhenEventIsWrongButIdIsPresent_ShouldNotLeakTheId()
-    {
-        var result = MpvProtocol.TryParsePropertyChange("{\"event\":\"seek\",\"id\": 7,\"data\":1}", out var id, out _);
-
-        result.ShouldBeFalse();
-        id.ShouldBe(0);
-    }
+    private static MpvPropertyChange ParsePropertyChange(string line)
+        => MpvProtocol.ParseMessage(line).ShouldBeOfType<MpvPropertyChange>();
 
     [Theory]
     [InlineData("{\"event\":\"property-change\",\"id\":1,\"data\":5}", 1, 5.0)]
     [InlineData("{\"event\":\"property-change\",\"id\":2,\"data\":-0.25}", 2, -0.25)]
     [InlineData("{\"event\":\"property-change\",\"id\":3,\"name\":\"time-pos\", \"data\": 12.5}", 3, 12.5)]
     [InlineData("{\"event\":\"property-change\",\"id\":4,\"data\":0}", 4, 0.0)]
-    public void TryParsePropertyChange_WhenDataIsANumber_ShouldReturnItAsDouble(string line, int expectedId, double expectedValue)
+    public void ParseMessage_WhenPropertyChangeDataIsANumber_ReturnsItAsDouble(string line, int expectedId, double expectedValue)
     {
-        var result = MpvProtocol.TryParsePropertyChange(line, out var id, out var value);
+        var change = ParsePropertyChange(line);
 
-        result.ShouldBeTrue();
-        id.ShouldBe(expectedId);
-        value.ShouldBeOfType<double>().ShouldBe(expectedValue);
+        change.PropertyId.ShouldBe(expectedId);
+
+        change.Value
+            .ShouldBeOfType<double>()
+            .ShouldBe(expectedValue);
     }
 
     [Theory]
     [InlineData("true", true)]
     [InlineData("false", false)]
-    public void TryParsePropertyChange_WhenDataIsABoolean_ShouldReturnBool(string json, bool expected)
+    public void ParseMessage_WhenPropertyChangeDataIsABoolean_ReturnsBool(string json, bool expected)
     {
-        var result = MpvProtocol.TryParsePropertyChange($"{{\"event\":\"property-change\",\"id\":1,\"name\":\"time-pos\",\"data\":{json}}}", out var id, out var value);
+        var change = ParsePropertyChange($"{{\"event\":\"property-change\",\"id\":1,\"name\":\"pause\",\"data\":{json}}}");
 
-        result.ShouldBeTrue();
-        id.ShouldBe(1);
-        value.ShouldBeOfType<bool>().ShouldBe(expected);
-    }
+        change.PropertyId.ShouldBe(1);
 
-
-    [Fact]
-    public void TryParsePropertyChange_WhenDataIsAString_ShouldReturnString()
-    {
-        var result = MpvProtocol.TryParsePropertyChange("{\"event\":\"property-change\",\"id\":1,\"name\":\"mute\",\"data\":\"mute\"}", out _, out var value);
-
-        result.ShouldBeTrue();
-        value.ShouldBeOfType<string>().ShouldBe("mute");
+        change.Value
+            .ShouldBeOfType<bool>()
+            .ShouldBe(expected);
     }
 
     [Fact]
-    public void TryParsePropertyChange_WhenDataIsExplicitNull_ShouldReturnTrueWithNullValue()
+    public void ParseMessage_WhenPropertyChangeDataIsAString_ReturnsString()
     {
-        var result = MpvProtocol.TryParsePropertyChange("{\"event\":\"property-change\",\"id\":5,\"name\":\"mute\",\"data\":null}", out var id, out var value);
-
-        result.ShouldBeTrue();
-        id.ShouldBe(5);
-        value.ShouldBeNull();
+        ParsePropertyChange("{\"event\":\"property-change\",\"id\":1,\"name\":\"mute\",\"data\":\"mute\"}").Value
+            .ShouldBeOfType<string>().ShouldBe("mute");
     }
-
-    [Fact]
-    public void TryParsePropertyChange_WhenDataIsMissing_ShouldReturnTrueWithNullValue()
-    {
-        var result = MpvProtocol.TryParsePropertyChange("{\"event\":\"property-change\",\"id\":5,\"name\":\"time-pos\"}", out var id, out var value);
-
-        result.ShouldBeTrue();
-        id.ShouldBe(5);
-        value.ShouldBeNull();
-    }
-
-    [Fact]
-    public void TryParsePropertyChange_WhenDataIsAnArray_ShouldReturnJsonElement()
-    {
-        var result = MpvProtocol.TryParsePropertyChange("{\"event\":\"property-change\",\"id\":9,\"data\":[{\"name\":\"mute\",\"enabled\":true}]}", out var id, out var value);
-
-        result.ShouldBeTrue();
-        id.ShouldBe(9);
-
-        var element = value.ShouldBeOfType<JsonElement>();
-        element.ValueKind.ShouldBe(JsonValueKind.Array);
-        element.GetArrayLength().ShouldBe(1);
-        element[0].GetProperty("name").GetString().ShouldBe("mute");
-        element[0].GetProperty("enabled").GetBoolean().ShouldBeTrue();
-    }
-
-    [Fact]
-    public void TryParsePropertyChange_WhenDataIsAnObject_ShouldReturnJsonElement()
-    {
-        var result = MpvProtocol.TryParsePropertyChange("{\"event\":\"property-change\",\"id\":9,\"name\":\"settings\",\"data\":{\"item\": 1}}", out _, out var value);
-
-        result.ShouldBeTrue();
-
-        var element = value.ShouldBeOfType<JsonElement>();
-        element.ValueKind.ShouldBe(JsonValueKind.Object);
-        element.GetProperty("item").GetInt32().ShouldBe(1);
-    }
-
-    [Fact]
-    public void TryParsePropertyChange_WhenPropertiesAreInADifferentOrderOrExtraOnesExist_ShouldStillParse()
-    {
-        var result = MpvProtocol.TryParsePropertyChange("{\"data\":42,\"extra\":[1,2,3],\"id\":8,\"name\":\"volume\",\"event\":\"property-change\"}", out var id, out var value);
-
-        result.ShouldBeTrue();
-        id.ShouldBe(8);
-        value.ShouldBeOfType<double>().ShouldBe(42.0);
-    }
-
-    public static TheoryData<string> TryParsePropertyChange_WhenLineIsNotAValidPropertyChange_ShouldReturnFalseData => new()
-    {
-        { "[]" },
-        { "42" },
-        { "\"property-change\"" },
-        { "null" },
-        { "{}" },
-        { "{\"id\": 1, \"data\": 5}" },
-        { "{\"event\": \"seek\", \"id\": 1, \"data\": 5}" },
-        { "{\"event\": 123, \"id\": 1, \"data\": 5}" },
-        { "{\"event\": \"property-change\", \"data\": 5}" },
-        { "{\"event\": \"property-change\", \"id\": \"abc\", \"data\": 5}" },
-    };
 
     [Theory]
-    [MemberData(nameof(TryParsePropertyChange_WhenLineIsNotAValidPropertyChange_ShouldReturnFalseData))]
-    public void TryParsePropertyChange_WhenLineIsNotAValidPropertyChange_ShouldReturnFalse(string line)
+    [InlineData("{\"event\":\"property-change\",\"id\":5,\"name\":\"mute\",\"data\":null}")]
+    [InlineData("{\"event\":\"property-change\",\"id\":5,\"name\":\"time-pos\"}")]
+    public void ParseMessage_WhenPropertyChangeDataIsNullOrMissing_ReturnsNullValue(string line)
     {
-        var result = MpvProtocol.TryParsePropertyChange(line, out var id, out var value);
+        var change = ParsePropertyChange(line);
 
-        result.ShouldBeFalse();
-        id.ShouldBe(0);
-        value.ShouldBeNull();
+        change.PropertyId.ShouldBe(5);
+        change.Value.ShouldBeNull();
+    }
+
+    [Fact]
+    public void ParseMessage_WhenPropertyChangeDataIsAnArray_ReturnsJsonElement()
+    {
+        var change = ParsePropertyChange("{\"event\":\"property-change\",\"id\":9,\"data\":[{\"name\":\"mute\",\"enabled\":true}]}");
+
+        change.PropertyId.ShouldBe(9);
+
+        var element = change.Value.ShouldBeOfType<JsonElement>();
+        element.ValueKind.ShouldBe(JsonValueKind.Array);
+        element
+            .GetArrayLength()
+            .ShouldBe(1);
+
+        element[0]
+            .GetProperty("name")
+            .GetString()
+            .ShouldBe("mute");
+
+        element[0]
+            .GetProperty("enabled")
+            .GetBoolean()
+            .ShouldBeTrue();
+    }
+
+    [Fact]
+    public void ParseMessage_WhenPropertyChangeDataIsAnObject_ReturnsJsonElement()
+    {
+        var element = ParsePropertyChange("{\"event\":\"property-change\",\"id\":9,\"name\":\"settings\",\"data\":{\"item\": 1}}").Value
+            .ShouldBeOfType<JsonElement>();
+
+        element.ValueKind.ShouldBe(JsonValueKind.Object);
+
+        element
+            .GetProperty("item")
+            .GetInt32()
+            .ShouldBe(1);
+    }
+
+    [Fact]
+    public void ParseMessage_WhenPropertiesAreInADifferentOrderOrExtraOnesExist_StillParses()
+    {
+        var change = ParsePropertyChange("{\"data\":42,\"extra\":[1,2,3],\"id\":8,\"name\":\"volume\",\"event\":\"property-change\"}");
+
+        change.PropertyId.ShouldBe(8);
+
+        change.Value
+            .ShouldBeOfType<double>()
+            .ShouldBe(42.0);
+    }
+
+
+    [Theory]
+    [InlineData("{\"request_id\":7,\"error\":\"success\",\"data\":null}", 7L, "success", true)]
+    [InlineData("{\"data\":null,\"request_id\":12,\"error\":\"error running command\"}", 12L, "error running command", false)]
+    [InlineData("{\"error\":\"property unavailable\",\"request_id\":0}", 0L, "property unavailable", false)]
+    [InlineData("{\"request_id\":9007199254740993,\"error\":\"success\"}", 9007199254740993L, "success", true)]
+    public void ParseMessage_WhenLineIsAReply_ReturnsTheReply(string line, long expectedId, string expectedError, bool expectedSuccess)
+    {
+        var reply = MpvProtocol
+            .ParseMessage(line)
+            .ShouldBeOfType<MpvReply>();
+
+        reply.RequestId.ShouldBe(expectedId);
+        reply.Error.ShouldBe(expectedError);
+        reply.IsSuccess.ShouldBe(expectedSuccess);
+    }
+
+    [Theory]
+    // empty or invalid JSON
+    [InlineData(null)]
+    [InlineData("")]
+    [InlineData("   ")]
+    [InlineData("{")]
+    [InlineData("not json")]
+    [InlineData("{\"event\": \"property-change\", \"id\": 1")]
+    // valid JSON, but not an object
+    [InlineData("[]")]
+    [InlineData("42")]
+    [InlineData("\"property-change\"")]
+    [InlineData("null")]
+    [InlineData("{}")]
+    // events we don't handle, or malformed property changes
+    [InlineData("{\"event\":\"seek\"}")]
+    [InlineData("{\"event\":\"seek\",\"id\": 7,\"data\":1}")]
+    [InlineData("{\"event\": 123, \"id\": 1, \"data\": 5}")]
+    [InlineData("{\"event\": \"property-change\", \"data\": 5}")]
+    [InlineData("{\"event\": \"property-change\", \"id\": \"abc\", \"data\": 5}")]
+    [InlineData("{\"id\": 1, \"data\": 5}")]
+    // events are never replies, even with reply-like fields; malformed replies
+    [InlineData("{\"event\":\"end-file\",\"reason\":\"error\",\"error\":\"loading failed\",\"request_id\":1}")]
+    [InlineData("{\"request_id\":1}")]
+    [InlineData("{\"error\":\"success\"}")]
+    [InlineData("{\"request_id\":\"1\",\"error\":\"success\"}")]
+    [InlineData("{\"request_id\":1.5,\"error\":\"success\"}")]
+    [InlineData("{\"request_id\":1,\"error\":5}")]
+    public void ParseMessage_WhenLineIsNeitherAReplyNorAPropertyChange_ReturnsNull(string? line)
+    {
+        MpvProtocol
+            .ParseMessage(line)
+            .ShouldBeNull();
     }
 }
