@@ -28,7 +28,6 @@
 
   <Target Name="PostClean" AfterTargets="Clean">
     <RemoveDir Directories="$(BaseOutputPath)" />
-    <RemoveDir Directories="$(BaseIntermediateOutputPath)" />
   </Target>
 
   <!-- Get rid of SkiaSharp pdbs which get pulled in from StreamDeck-Tools; can do without the  200+MB! -->
