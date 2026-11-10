@@ -1,6 +1,6 @@
 using System.Diagnostics.CodeAnalysis;
 
-namespace MpvStreamDeckController;
+namespace MpvStreamDeckController.Actions.Settings;
 
 /// <summary>
 /// mpv's OSD command prefixes. See "Input Command Prefixes" here: https://mpv.io/manual/stable/#input-command-prefixes

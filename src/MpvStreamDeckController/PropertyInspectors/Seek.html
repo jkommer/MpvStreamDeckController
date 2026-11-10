@@ -1,0 +1,27 @@
+<!DOCTYPE html>
+<html>
+<head lang="en">
+    <meta charset="utf-8" />
+    <script src="sdpi-components.js"></script>
+    <script src="scripts.js"></script>
+    <link rel="stylesheet" href="styles.css" />
+</head>
+<body>
+    <sdpi-item label="Interval (s)">
+        <sdpi-textfield setting="seekInterval" placeholder="1" pattern="\d*\.?\d+"></sdpi-textfield>
+    </sdpi-item>
+    <sdpi-item label="Seek type">
+        <sdpi-select setting="seekType" default="">
+            <option value="">mpv default (hr-seek)</option>
+            <option value="exact">Exact</option>
+            <option value="keyframes">Keyframes</option>
+        </sdpi-select>
+    </sdpi-item>
+    <mpv-osd-select></mpv-osd-select>
+    <details>
+        <summary>About these settings</summary>
+        <p><b>Interval</b> is the number of seconds to seek per dial tick, e.g. 1 or 0.5. Empty or invalid values use 1 second.</p>
+        <p><b>Seek type</b>: <i>Exact</i> lands exactly on the target but can be slower on some files; <i>Keyframes</i> is fast but can jump several seconds on files with few keyframes. <i>mpv default</i> follows the hr-seek option in your mpv.conf.</p>
+    </details>
+</body>
+</html>

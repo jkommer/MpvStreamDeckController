@@ -146,7 +146,7 @@
                     "Image": "Images/dial/09_seek_dial"
                 }
             ],
-            "PropertyInspectorPath": "PropertyInspectors/Default.html",
+            "PropertyInspectorPath": "PropertyInspectors/Seek.html",
             "UUID": "com.jkommer.mpv.seek"
         },
         {
@@ -189,7 +189,7 @@
                     "Image": "Images/dial/11b_volume_muted_dial"
                 }
             ],
-            "PropertyInspectorPath": "PropertyInspectors/Default.html",
+            "PropertyInspectorPath": "PropertyInspectors/Volume.html",
             "UUID": "com.jkommer.mpv.volume"
         }
     ],

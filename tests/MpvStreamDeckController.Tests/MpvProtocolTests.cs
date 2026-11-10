@@ -1,4 +1,5 @@
-﻿using Shouldly;
+﻿using MpvStreamDeckController.Actions.Settings;
+using Shouldly;
 using System.Text.Json;
 
 namespace MpvStreamDeckController.Tests;

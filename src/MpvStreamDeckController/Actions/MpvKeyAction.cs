@@ -1,4 +1,6 @@
 using BarRaider.SdTools;
+using MpvStreamDeckController.Actions.Settings;
+using Newtonsoft.Json.Linq;
 
 namespace MpvStreamDeckController.Actions;
 
@@ -32,7 +34,14 @@ public abstract class MpvKeyAction : KeypadBase
     public override void KeyReleased(KeyPayload payload) { }
     public override void OnTick() { }
     public override void ReceivedGlobalSettings(ReceivedGlobalSettingsPayload payload) { }
-    public override void ReceivedSettings(ReceivedSettingsPayload payload) => _settings = CommonActionSettings.Read(payload.Settings);
+    public sealed override void ReceivedSettings(ReceivedSettingsPayload payload)
+    {
+        _settings = CommonActionSettings.Read(payload.Settings);
+        OnSettingsChanged(payload.Settings);
+    }
+
+    /// <summary>Called when the user changes the action's settings; the constructor reads them the first time.</summary>
+    protected virtual void OnSettingsChanged(JObject? settings) { }
 
     private void OnFeedbackChanged(KeyFeedback feedback)
     {

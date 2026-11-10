@@ -1,4 +1,5 @@
 using System.Text.Json;
+using MpvStreamDeckController.Actions.Settings;
 using Shouldly;
 
 namespace MpvStreamDeckController.Tests;
@@ -43,7 +44,7 @@ public class PropertyInspectorTests
     }
 
     /// <summary>
-    /// The text between <c>/* name */</c> and <c>/* /name */</c> in a property inspector file.
+    /// The text between <c>/** name **/</c> and <c>/** /name **/</c> in a property inspector file.
     /// </summary>
     private static string ReadMarkedJson(string file, string name)
     {

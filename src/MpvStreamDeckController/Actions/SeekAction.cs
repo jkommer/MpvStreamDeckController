@@ -1,13 +1,23 @@
 using BarRaider.SdTools;
+using MpvStreamDeckController.Actions.Settings;
+using Newtonsoft.Json.Linq;
 
 namespace MpvStreamDeckController.Actions;
 
 [PluginActionId("com.jkommer.mpv.seek")]
-public class SeekAction(ISDConnection connection, InitialPayload payload) : MpvDialAction(connection, payload, [MpvProperties.TimePos, MpvProperties.Duration])
+public class SeekAction(ISDConnection connection, InitialPayload payload)
+    : MpvDialAction(connection, payload, [MpvProperties.TimePos, MpvProperties.Duration])
 {
-    protected override MpvCommand[] RotateCommands(int ticks) => [new("seek", ticks, "relative")];
+    private volatile SeekSettings _seekSettings = SeekSettings.Read(payload.Settings);
+
+    protected override MpvCommand[] RotateCommands(int ticks) => [_seekSettings.CreateCommand(ticks)];
 
     protected override MpvCommand[] PressCommands => [new("cycle", "pause")];
+
+    protected override void OnSettingsChanged(JObject? settings)
+    {
+        _seekSettings = SeekSettings.Read(settings);
+    }
 
     protected override DialFeedback GetFeedback(MpvState state)
     {
@@ -15,7 +25,7 @@ public class SeekAction(ISDConnection connection, InitialPayload payload) : MpvD
         {
             return default;
         }
-        
+
         var position = Math.Max(0, time);
         var duration = Math.Max(0, state.Number(MpvProperties.Duration) ?? 0);
 

@@ -1,8 +1,8 @@
-using MpvStreamDeckController.Actions;
+using MpvStreamDeckController.Actions.Settings;
 using Newtonsoft.Json.Linq;
 using Shouldly;
 
-namespace MpvStreamDeckController.Tests;
+namespace MpvStreamDeckController.Tests.Actions.Settings;
 
 public class CommonActionSettingsTests
 {

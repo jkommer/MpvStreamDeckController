@@ -1,6 +1,6 @@
 using Newtonsoft.Json.Linq;
 
-namespace MpvStreamDeckController.Actions;
+namespace MpvStreamDeckController.Actions.Settings;
 
 /// <summary>
 /// Settings shared by every action. <see cref="Apply(MpvCommand)"/> these settings to commands before sending them.
@@ -22,7 +22,7 @@ public sealed record CommonActionSettings(MpvOsdMode? Osd = null)
             return Default;
         }
 
-        return new(Osd: ReadString(settings, OsdKey) is { } prefix && MpvOsdMode.TryParse(prefix, out var osd) ? osd : null);
+        return new(Osd: MpvOsdMode.TryParse(SettingsValues.ReadString(settings, OsdKey), out var osd) ? osd : null);
     }
 
     public MpvCommand Apply(MpvCommand command)
@@ -36,6 +36,4 @@ public sealed record CommonActionSettings(MpvOsdMode? Osd = null)
     }
 
     public MpvCommand[]? Apply(MpvCommand[]? commands) => commands is null || this == Default ? commands : [.. commands.Select(Apply)];
-
-    private static string? ReadString(JObject settings, string key) => settings[key] is JValue { Value: string value } ? value : null;
 }

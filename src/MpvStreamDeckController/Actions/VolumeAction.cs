@@ -1,21 +1,34 @@
 using BarRaider.SdTools;
+using MpvStreamDeckController.Actions.Settings;
+using Newtonsoft.Json.Linq;
 
 namespace MpvStreamDeckController.Actions;
 
 [PluginActionId("com.jkommer.mpv.volume")]
-public class VolumeAction(ISDConnection connection, InitialPayload payload) : MpvDialAction(connection, payload, [MpvProperties.Volume, MpvProperties.VolumeMax, MpvProperties.Mute])
+public class VolumeAction : MpvDialAction
 {
-    private const int PercentPerTick = 2;
     private const double DefaultVolumeMax = 100;
 
     // Paths relative to the plugin folder; must match the files you ship.
     private const string VolumeIcon = "Images/dial/11a_volume_dial";
     private const string MutedIcon = "Images/dial/11b_volume_muted_dial";
 
-    // mpv clamps "add volume" to [0, volume-max], so no range handling is needed here.
-    protected override MpvCommand[] RotateCommands(int ticks) => [new("add", "volume", ticks * PercentPerTick)];
+    private volatile VolumeSettings _volumeSettings;
+
+    public VolumeAction(ISDConnection connection, InitialPayload payload)
+        : base(connection, payload, [MpvProperties.Volume, MpvProperties.VolumeMax, MpvProperties.Mute])
+    {
+        _volumeSettings = VolumeSettings.Read(payload.Settings);
+    }
+
+    protected override MpvCommand[] RotateCommands(int ticks) => [_volumeSettings.CreateCommand(ticks)];
 
     protected override MpvCommand[] PressCommands => [new("cycle", "mute")];
+
+    protected override void OnSettingsChanged(JObject? settings)
+    {
+        _volumeSettings = VolumeSettings.Read(settings);
+    }
 
     protected override DialFeedback GetFeedback(MpvState state)
     {

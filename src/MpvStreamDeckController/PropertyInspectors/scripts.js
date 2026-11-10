@@ -1,5 +1,5 @@
-// The OSD dropdown's options. After the "mpv default" entry, the values must match MpvOsdMode.All in the plugin, in the
-// do not remove ** osd-modes ** comments as this is used to find the JSON object for a verification unit test. 
+// The OSD dropdown's options. After the "mpv default" entry, the values must match MpvOsdMode.All in the plugin, in the same order.
+// PropertyInspectorTests checks this by reading the list between the osd-modes markers as JSON, so keep the markers and keep the list valid JSON.
 const osdModes = /** osd-modes **/ [
     { "value": "", "label": "None (mpv default)" },
     { "value": "osd-auto", "label": "Auto" },

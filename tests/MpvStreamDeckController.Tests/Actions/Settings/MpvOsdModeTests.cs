@@ -1,6 +1,7 @@
+using MpvStreamDeckController.Actions.Settings;
 using Shouldly;
 
-namespace MpvStreamDeckController.Tests;
+namespace MpvStreamDeckController.Tests.Actions.Settings;
 
 public class MpvOsdModeTests
 {

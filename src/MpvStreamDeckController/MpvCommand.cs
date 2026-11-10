@@ -1,3 +1,5 @@
+using MpvStreamDeckController.Actions.Settings;
+
 namespace MpvStreamDeckController
 {
     public record MpvCommand(params object[] Components)

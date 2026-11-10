@@ -66,6 +66,57 @@ public class MpvCommandParserTests
 
         result.ShouldNotBeNull();
         result.Commands.ShouldBe(expectedCommands);
-        result.Description.ShouldBe(expectedDescription);        
+        result.Description.ShouldBe(expectedDescription);
+    }
+
+    public static TheoryData<string, string> TryParse_EscapesInDoubleQuotes_AreResolvedData => new()
+    {
+        { @"show-text ""a\nb""", "a\nb" },
+        { @"show-text ""a\tb\rc\bd\fe""", "a\tb\rc\bd\fe" },
+        { @"show-text ""\""quoted\""""", "\"quoted\"" },
+        { @"show-text ""back\\slash""", @"back\slash" },
+        { @"show-text ""a\/b\'c""", "a/b'c" },
+        { @"show-text ""\e[1m""", "\u001b[1m" },
+        // \xHH appends one raw byte, so a multi-byte UTF-8 character is written as its bytes
+        { @"show-text ""\x41\x4a\x4A""", "AJJ" },
+        { @"show-text ""caf\xc3\xa9""", "café" },
+        { @"show-text ""café €""", "café €" },
+        // a high surrogate must be followed by a low one; together they make one code point
+        { @"show-text ""😀""", "😀" },
+        // like mpv, a lone low surrogate isn't rejected; it's encoded as invalid UTF-8, which decodes to U+FFFD
+        { @"show-text ""\udc00""", "���" },
+        // escapes are only resolved in double quotes
+        { @"show-text 'a\nb'", @"a\nb" },
+        { @"show-text a\nb", @"a\nb" },
+    };
+
+    [Theory]
+    [MemberData(nameof(TryParse_EscapesInDoubleQuotes_AreResolvedData))]
+    public void TryParse_EscapesInDoubleQuotes_AreResolved(string text, string expectedArgument)
+    {
+        MpvCommandParser.TryParse(text, out var result, out _).ShouldBeTrue();
+
+        result.Commands.ShouldHaveSingleItem()[1].ShouldBe(expectedArgument);
+    }
+
+    [Theory]
+    [InlineData(@"show-text ""\q""")]           // unknown escape
+    [InlineData(@"show-text ""abc\")]           // backslash at the end
+    [InlineData(@"show-text ""\x4""")]          // too short
+    [InlineData(@"show-text ""\xZZ""")]         // not hex
+    [InlineData(@"show-text ""\x+f""")]         // mpv's strtoll would accept this; deliberately rejected
+    [InlineData(@"show-text ""\u12""")]         // too short
+    [InlineData(@"show-text ""\uZZZZ""")]       // not hex
+    [InlineData(@"show-text ""\ud83d""")]       // high surrogate on its own
+    [InlineData(@"show-text ""\ud83dx\ude00""")] // high surrogate not directly followed by \u
+    [InlineData(@"show-text ""\ud83dA""")] // high surrogate followed by something other than a low surrogate
+    public void TryParse_BrokenEscape_ReturnsFalse(string text)
+    {
+        var isSuccessful = MpvCommandParser.TryParse(text, out var result, out var error);
+
+        isSuccessful.ShouldBeFalse();
+        result.ShouldBeNull();
+        error.ShouldNotBeNull();
+        error.ShouldContain("Broken string escapes");
     }
 }

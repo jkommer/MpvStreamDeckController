@@ -1,6 +1,8 @@
 using System.Globalization;
 using BarRaider.SdTools;
 using BarRaider.SdTools.Payloads;
+using MpvStreamDeckController.Actions.Settings;
+using Newtonsoft.Json.Linq;
 
 namespace MpvStreamDeckController.Actions;
 
@@ -27,7 +29,7 @@ public abstract class MpvDialAction : KeyAndEncoderBase
 
         if (observedProperties is { Count: > 0 })
         {
-            _stateSubscription = new MpvStateSubscription<DialFeedback>(observedProperties, GetFeedback, OnFeedbackChanged);
+            _stateSubscription = new(observedProperties, GetFeedback, OnFeedbackChanged);
         }
     }
 
@@ -47,7 +49,14 @@ public abstract class MpvDialAction : KeyAndEncoderBase
     public override void OnTick() { }
     
     public override void ReceivedGlobalSettings(ReceivedGlobalSettingsPayload payload) { }
-    public override void ReceivedSettings(ReceivedSettingsPayload payload) => _settings = CommonActionSettings.Read(payload.Settings);
+    public sealed override void ReceivedSettings(ReceivedSettingsPayload payload)
+    {
+        _settings = CommonActionSettings.Read(payload.Settings);
+        OnSettingsChanged(payload.Settings);
+    }
+
+    /// <summary>Called when the user changes the action's settings; the constructor reads them the first time.</summary>
+    protected virtual void OnSettingsChanged(JObject? settings) { }
 
     private void SendCommands(MpvCommand[]? commands) => _ = Connection.SendCommandsAsync(_settings.Apply(commands));
     
