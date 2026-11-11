@@ -30,7 +30,10 @@ public class VolumeAction(ISDConnection connection, InitialPayload payload) : Mp
     /// </summary>
     internal static string FormatVolume(double volume) => string.Create(CultureInfo.InvariantCulture, $"{volume:0.#}%");
 
-    protected override DialFeedback GetFeedback(MpvState state)
+    protected override DialFeedback GetFeedback(MpvState state) => CreateFeedback(state);
+
+    /// <summary>What the dial shows for a given mpv state. Separate from the action so it can be tested without a Stream Deck connection.</summary>
+    internal static DialFeedback CreateFeedback(MpvState state)
     {
         if (!state.IsConnected || state.Number(MpvProperties.Volume) is not { } volume)
         {
