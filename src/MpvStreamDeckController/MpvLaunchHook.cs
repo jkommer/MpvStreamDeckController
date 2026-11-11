@@ -17,9 +17,15 @@ public static class MpvLaunchHook
     /// <summary>Call from every action's constructor; only the first call does anything.</summary>
     public static void EnsureAttached(ISDConnection connection)
     {
+        // A connection without the shared connection behind it only occurs in tests, where there is nothing to attach to.
+        if (connection.StreamDeckConnection is not { } sharedConnection)
+        {
+            return;
+        }
+
         if (Interlocked.Exchange(ref _attached, 1) == 0)
         {
-            connection.StreamDeckConnection.OnApplicationDidLaunch += (_, _) => MpvClient.Instance.NotifyMpvLaunched();
+            sharedConnection.OnApplicationDidLaunch += (_, _) => MpvClient.Instance.NotifyMpvLaunched();
         }
     }
 }

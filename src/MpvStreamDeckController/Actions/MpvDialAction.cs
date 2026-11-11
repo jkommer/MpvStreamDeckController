@@ -1,4 +1,5 @@
 using System.Globalization;
+using System.Runtime.CompilerServices;
 using BarRaider.SdTools;
 using BarRaider.SdTools.Payloads;
 using MpvStreamDeckController.Actions.Settings;
@@ -21,20 +22,31 @@ public abstract class MpvDialAction : KeyAndEncoderBase
     private readonly MpvStateSubscription<DialFeedback>? _stateSubscription;
     private volatile CommonActionSettings _settings;
     private volatile MpvState _state = MpvState.Inactive;
+    private readonly IMpvClient _mpv;
 
     protected MpvDialAction(ISDConnection connection, InitialPayload payload, IReadOnlyCollection<MpvProperty> observedProperties)
+        : this(connection, payload, MpvClient.Instance, observedProperties)
+    {
+    }
+
+    /// <summary>For tests: as the other constructor, but talking to <paramref name="mpv"/> instead of the shared <see cref="MpvClient.Instance"/>.</summary>
+    private protected MpvDialAction(ISDConnection connection, InitialPayload payload, IMpvClient mpv, IReadOnlyCollection<MpvProperty> observedProperties)
         : base(connection, payload)
     {
         MpvLaunchHook.EnsureAttached(connection);
+        _mpv = mpv;
         _settings = CommonActionSettings.Read(payload.Settings);
 
         if (observedProperties is { Count: > 0 })
         {
-            _stateSubscription = new(observedProperties, OnStateChanged, OnFeedbackChanged);
+            _stateSubscription = new(mpv, observedProperties, OnStateChanged, OnFeedbackChanged);
         }
     }
 
+    /// <summary>The commands to send when the dial is turned by <paramref name="ticks"/>, negative for anticlockwise.</summary>
     protected abstract MpvCommand[] RotateCommands(int ticks);
+
+    /// <summary>The commands to send when the dial is pressed or its touch strip is tapped, read at each press.</summary>
     protected abstract MpvCommand[] PressCommands { get; }
 
     /// <summary>
@@ -43,7 +55,14 @@ public abstract class MpvDialAction : KeyAndEncoderBase
     /// </summary>
     protected MpvState State => _state;
 
-    /// <summary>What the dial should show for a given mpv state. Only called for actions that observe properties.</summary>
+    /// <summary>
+    /// What the dial should show for a given mpv state. Only called for actions that observe properties.
+    /// <para>
+    /// The first call happens inside this class's constructor, before the derived class's constructor body has run. An
+    /// override must therefore not use fields that are assigned in a constructor body; field initialisers and primary
+    /// constructor parameters are fine. Keeping it a function of <paramref name="state"/> alone avoids the problem.
+    /// </para>
+    /// </summary>
     protected abstract DialFeedback GetFeedback(MpvState state);
 
     private DialFeedback OnStateChanged(MpvState state)
@@ -73,7 +92,10 @@ public abstract class MpvDialAction : KeyAndEncoderBase
     /// <summary>Called when the user changes the action's settings; the constructor reads them the first time.</summary>
     protected virtual void OnSettingsChanged(JObject? settings) { }
 
-    private void SendCommands(MpvCommand[]? commands) => _ = Connection.SendCommandsAsync(_settings.Apply(commands));
+    /// <param name="commands">The commands to send.</param>
+    /// <param name="trigger">The dial event that triggered the send, for the log; filled in by the compiler.</param>
+    private void SendCommands(MpvCommand[] commands, [CallerMemberName] string trigger = "")
+        => _ = Connection.SendCommandsAsync(_mpv, _settings.Apply(commands), GetType().Name, trigger);
 
     private void OnFeedbackChanged(DialFeedback feedback) => _ = SetFeedbackAsync(feedback);
 
@@ -84,7 +106,8 @@ public abstract class MpvDialAction : KeyAndEncoderBase
             var values = new Dictionary<string, string>
             {
                 [BarKey] = Math.Clamp(feedback.Progress, 0, 100).ToString("0.##", CultureInfo.InvariantCulture),
-                [ValueKey] = feedback.Text,
+                // default(DialFeedback) skips the constructor's default, leaving Text null; send that as empty text so the dial is cleared.
+                [ValueKey] = feedback.Text ?? "",
             };
 
             if (feedback.Icon is not null)

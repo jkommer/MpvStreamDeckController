@@ -6,7 +6,7 @@ using BarRaider.SdTools;
 
 namespace MpvStreamDeckController;
 
-public sealed class MpvClient : IMpvStateSource, IDisposable
+public sealed class MpvClient : IMpvClient, IDisposable
 {
     private const string PipeName = "mpvsocket";
 

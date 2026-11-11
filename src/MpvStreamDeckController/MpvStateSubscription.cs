@@ -11,12 +11,7 @@ public sealed class MpvStateSubscription<TView> : IDisposable where TView : stru
     private long _lastVersion = -1;
     private volatile bool _disposed;
 
-    public MpvStateSubscription(IReadOnlyCollection<MpvProperty> observedProperties, Func<MpvState, TView> getFeedback, Action<TView> onFeedbackChanged)
-        : this(MpvClient.Instance, observedProperties, getFeedback, onFeedbackChanged)
-    {
-    }
-
-    internal MpvStateSubscription(IMpvStateSource source, IReadOnlyCollection<MpvProperty> observedProperties, Func<MpvState, TView> getFeedback, Action<TView> onFeedbackChanged)
+    public MpvStateSubscription(IMpvStateSource source, IReadOnlyCollection<MpvProperty> observedProperties, Func<MpvState, TView> getFeedback, Action<TView> onFeedbackChanged)
     {
         _source = source;
         _getFeedback = getFeedback;
