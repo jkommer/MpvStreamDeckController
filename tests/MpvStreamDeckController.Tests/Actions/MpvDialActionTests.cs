@@ -79,6 +79,21 @@ public class MpvDialActionTests
     }
 
     [Fact]
+    public void Events_WhenWorkingOutTheCommandsThrows_ShowTheAlertInsteadOfThrowing()
+    {
+        // The Stream Deck library doesn't catch exceptions from these handlers; one would end the plugin process.
+        using var action = CreateAction();
+        action.ThrowFromCommands = true;
+
+        Should.NotThrow(() => action.DialRotate(TestPayloads.Rotate(1)));
+        Should.NotThrow(() => action.DialDown(null!));
+        Should.NotThrow(() => action.TouchPress(null!));
+
+        _mpv.Sent.ShouldBeEmpty();
+        _connection.Alerts.ShouldBe(3);
+    }
+
+    [Fact]
     public void Commands_UseTheOsdSettingTheActionWasCreatedWith()
     {
         using var action = CreateAction(settings: new() { ["osd"] = "osd-msg" });
@@ -230,9 +245,14 @@ public class MpvDialActionTests
 
         public MpvState CurrentState => State;
 
-        protected override MpvCommand[] RotateCommands(int ticks) => [new("rotate", ticks)];
+        /// <summary>When true, working out the rotate or press commands throws.</summary>
+        public bool ThrowFromCommands { get; set; }
 
-        protected override MpvCommand[] PressCommands => [new("press")];
+        protected override MpvCommand[] RotateCommands(int ticks)
+            => ThrowFromCommands ? throw new InvalidOperationException("Simulated failure working out the commands.") : [new("rotate", ticks)];
+
+        protected override MpvCommand[] PressCommands
+            => ThrowFromCommands ? throw new InvalidOperationException("Simulated failure working out the commands.") : [new("press")];
 
         protected override DialFeedback GetFeedback(MpvState state) => Feedback(state);
 

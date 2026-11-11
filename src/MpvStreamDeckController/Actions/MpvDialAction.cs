@@ -37,9 +37,9 @@ public abstract class MpvDialAction : MpvAction<DialFeedback>
     /// <summary>The commands to send when the dial is pressed or its touch strip is tapped, read at each press.</summary>
     protected abstract MpvCommand[] PressCommands { get; }
 
-    public override void DialRotate(DialRotatePayload payload) => SendCommands(RotateCommands(payload.Ticks));
-    public override void DialDown(DialPayload payload) => SendCommands(PressCommands);
-    public override void TouchPress(TouchpadPressPayload payload) => SendCommands(PressCommands);
+    public override void DialRotate(DialRotatePayload payload) => SendCommands(() => RotateCommands(payload.Ticks));
+    public override void DialDown(DialPayload payload) => SendCommands(() => PressCommands);
+    public override void TouchPress(TouchpadPressPayload payload) => SendCommands(() => PressCommands);
 
     protected override void ShowFeedback(DialFeedback feedback) => _ = SetFeedbackAsync(feedback);
 

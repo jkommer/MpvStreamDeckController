@@ -71,13 +71,17 @@ public abstract class MpvAction<TFeedback> : KeyAndEncoderBase where TFeedback :
     protected virtual void OnSettingsChanged(JObject? settings) { }
 
     /// <summary>
-    /// Sends the commands to mpv with the action's common settings applied, and shows the alert if that fails or
-    /// <paramref name="commands"/> is null. Returns straight away; the send carries on in the background.
+    /// Sends the commands to mpv with the action's common settings applied, and shows the alert if that fails or there
+    /// are no commands. Returns straight away; the send carries on in the background.
+    /// <para>
+    /// The commands are passed as a function so that working them out is covered too: if it throws, that is logged and
+    /// the alert is shown, instead of the exception reaching the Stream Deck library, which would end the plugin.
+    /// </para>
     /// </summary>
-    /// <param name="commands">The commands to send, or null if the action has nothing valid to send.</param>
+    /// <param name="getCommands">Returns the commands to send, or null if the action has nothing valid to send.</param>
     /// <param name="trigger">The event that triggered the send, for the log; filled in by the compiler.</param>
-    protected void SendCommands(MpvCommand[]? commands, [CallerMemberName] string trigger = "")
-        => _ = Connection.SendCommandsAsync(_mpv, _settings.Apply(commands), GetType().Name, trigger);
+    protected void SendCommands(Func<MpvCommand[]?> getCommands, [CallerMemberName] string trigger = "")
+        => _ = Connection.SendCommandsAsync(_mpv, () => _settings.Apply(getCommands()), GetType().Name, trigger);
 
     private TFeedback OnStateChanged(MpvState state)
     {

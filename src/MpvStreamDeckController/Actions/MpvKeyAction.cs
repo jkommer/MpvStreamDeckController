@@ -33,7 +33,7 @@ public abstract class MpvKeyAction : MpvAction<KeyFeedback>
     /// </summary>
     protected override KeyFeedback GetFeedback(MpvState state) => default;
 
-    public override void KeyPressed(KeyPayload payload) => SendCommands(Commands);
+    public override void KeyPressed(KeyPayload payload) => SendCommands(() => Commands);
 
     protected override void ShowFeedback(KeyFeedback feedback)
     {

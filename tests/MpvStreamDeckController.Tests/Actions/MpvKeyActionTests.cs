@@ -78,6 +78,19 @@ public class MpvKeyActionTests
     }
 
     [Fact]
+    public void KeyPressed_WhenWorkingOutTheCommandsThrows_ShowsTheAlertInsteadOfThrowing()
+    {
+        // The Stream Deck library doesn't catch exceptions from KeyPressed; one would end the plugin process.
+        using var action = CreateAction();
+        action.ThrowFromCommands = true;
+
+        Should.NotThrow(() => action.KeyPressed(null!));
+
+        _mpv.Sent.ShouldBeEmpty();
+        _connection.Alerts.ShouldBe(1);
+    }
+
+    [Fact]
     public void KeyPressed_AppliesTheOsdSettingTheActionWasCreatedWith()
     {
         using var action = CreateAction(settings: new() { ["osd"] = "osd-bar" });
@@ -217,7 +230,11 @@ public class MpvKeyActionTests
 
         public MpvState CurrentState => State;
 
-        protected override MpvCommand[]? Commands => CommandsToSend;
+        /// <summary>When true, reading the commands throws.</summary>
+        public bool ThrowFromCommands { get; set; }
+
+        protected override MpvCommand[]? Commands
+            => ThrowFromCommands ? throw new InvalidOperationException("Simulated failure working out the commands.") : CommandsToSend;
 
         protected override KeyFeedback GetFeedback(MpvState state)
         {
