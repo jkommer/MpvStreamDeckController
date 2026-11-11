@@ -2,11 +2,15 @@
   <PropertyGroup>
     <OutputType>Exe</OutputType>
     <TargetFramework>net10.0</TargetFramework>
+    <!-- The plugin is Windows only (see manifest.json); a fixed RID keeps the other platforms' native libraries out of the package. -->
+    <RuntimeIdentifier>win-x64</RuntimeIdentifier>
+    <SelfContained>false</SelfContained>
     <ImplicitUsings>enable</ImplicitUsings>
     <Nullable>enable</Nullable>
     <AssemblyName>com.jkommer.mpv</AssemblyName>
     <OutputPath>bin\$(Configuration)\com.jkommer.mpv.sdPlugin\</OutputPath>
     <AppendTargetFrameworkToOutputPath>False</AppendTargetFrameworkToOutputPath>
+    <AppendRuntimeIdentifierToOutputPath>False</AppendRuntimeIdentifierToOutputPath>
     <ApplicationIcon>Images\plugin\mpv.ico</ApplicationIcon>
   </PropertyGroup>
 
@@ -18,8 +22,12 @@
     <None Update="manifest.json">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </None>
-      <None Update="Images/**/*">
+    <None Update="Images/**/*">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
+    <!-- Development material, not part of the plugin. -->
+    <None Update="Images/docs/**;Images/tools/**">
+      <CopyToOutputDirectory>Never</CopyToOutputDirectory>
     </None>
     <None Update="PropertyInspectors\**">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
