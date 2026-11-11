@@ -81,7 +81,7 @@ public abstract class MpvDialAction : KeyAndEncoderBase
         }
         catch (Exception ex)
         {
-            LogHelper.Log(TracingLevel.ERROR, $"SetFeedback failed: {ex.Message}");
+            LogHelper.Log(TracingLevel.ERROR, $"SetFeedback failed: {ex}");
         }
     }
 

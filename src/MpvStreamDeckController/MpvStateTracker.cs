@@ -235,7 +235,7 @@ public sealed class MpvStateTracker(Action observedPropertiesChanged)
             }
             catch (Exception ex)
             {
-                LogHelper.Log(TracingLevel.ERROR, $"mpv state handler failed: {ex.Message}");
+                LogHelper.Log(TracingLevel.ERROR, $"mpv state handler failed: {ex}");
             }
         }
     }

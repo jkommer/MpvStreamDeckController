@@ -16,7 +16,7 @@ namespace MpvStreamDeckController
             }
             catch (Exception ex)
             {
-                LogHelper.Log(TracingLevel.ERROR, $"{caller} failed: {ex.Message}");
+                LogHelper.Log(TracingLevel.ERROR, $"{caller} failed: {ex}");
             }
         }
     }

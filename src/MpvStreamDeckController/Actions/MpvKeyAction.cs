@@ -69,7 +69,7 @@ public abstract class MpvKeyAction : KeypadBase
         }
         catch (Exception ex)
         {
-            LogHelper.Log(TracingLevel.ERROR, $"Updating key failed: {ex.Message}");
+            LogHelper.Log(TracingLevel.ERROR, $"Updating key failed: {ex}");
         }
     }
 

@@ -152,7 +152,7 @@ namespace MpvStreamDeckController
                     }
                     catch (Exception ex) when (ex is not OperationCanceledException)
                     {
-                        LogHelper.Log(TracingLevel.ERROR, $"mpv session error: {ex.Message}");
+                        LogHelper.Log(TracingLevel.ERROR, $"mpv session error: {ex}");
                         await Task.Delay(TimeSpan.FromSeconds(1), token);
                     }
                 }
@@ -180,7 +180,7 @@ namespace MpvStreamDeckController
             }
             catch (Exception ex)
             {
-                LogHelper.Log(TracingLevel.ERROR, $"mpv connector failed: {ex.Message}");
+                LogHelper.Log(TracingLevel.ERROR, $"mpv connector failed: {ex}");
                 SignalConnectAttemptFinished();
                 return false;
             }
@@ -317,7 +317,7 @@ namespace MpvStreamDeckController
                 }
                 catch (Exception ex)
                 {
-                    LogHelper.Log(TracingLevel.ERROR, $"Error sending mpv command {json.TrimEnd()}: {ex.Message}");
+                    LogHelper.Log(TracingLevel.ERROR, $"Error sending mpv command {json.TrimEnd()}: {ex}");
                     return MpvSendResult.WriteFailed;
                 }
                 finally
@@ -476,7 +476,7 @@ namespace MpvStreamDeckController
             }
             catch (Exception ex)
             {
-                LogHelper.Log(TracingLevel.ERROR, $"Syncing mpv observations failed: {ex.Message}");
+                LogHelper.Log(TracingLevel.ERROR, $"Syncing mpv observations failed: {ex}");
             }
             finally
             {
@@ -506,7 +506,7 @@ namespace MpvStreamDeckController
             }
             catch (AggregateException ex)
             {
-                LogHelper.Log(TracingLevel.ERROR, $"mpv connection loop failed: {ex.InnerException?.Message}");
+                LogHelper.Log(TracingLevel.ERROR, $"mpv connection loop failed: {ex.InnerException ?? ex}");
             }
 
             // The semaphores are deliberately not disposed: senders may still be waiting on them, and SemaphoreSlim
