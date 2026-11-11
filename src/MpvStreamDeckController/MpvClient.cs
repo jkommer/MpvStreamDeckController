@@ -18,6 +18,11 @@ namespace MpvStreamDeckController
         private readonly MpvStateTracker _stateTracker;
 
         private readonly SemaphoreSlim _writeLock = new(1, 1);
+
+        /// <summary>
+        /// Held while a batch of two or more commands is sent, so two such batches run one after the other instead of interleaving.
+        /// </summary>
+        private readonly SemaphoreSlim _batchLock = new(1, 1);
         private readonly SemaphoreSlim _connectRequested = new(0, 1);
         private readonly CancellationTokenSource _cancellationTokenSource = new();
         private readonly Task _connectionTask;
@@ -242,22 +247,43 @@ namespace MpvStreamDeckController
         /// <summary>
         /// Sends commands one at a time, waiting for each reply, and stops at the first failure so later commands don't run after an earlier one was rejected.
         /// </summary>
+        /// <remarks>
+        /// Batches of two or more commands don't interleave with each other: a second one waits until the first has finished.
+        /// A single command is never held back, so it can still land between the commands of a batch that is in progress.
+        /// That keeps e.g. dial ticks responsive while a batch waits for a slow reply.
+        /// </remarks>
         /// <returns>The first failure, or else the last command's result (<see cref="MpvSendResult.Success"/> if there were none).</returns>
         public async Task<MpvSendResult> SendAsync(IEnumerable<MpvCommand> commands)
         {
-            var result = MpvSendResult.Success;
+            var batch = commands as IReadOnlyList<MpvCommand> ?? [.. commands];
 
-            foreach (var command in commands)
+            if (batch.Count < 2)
             {
-                result = await SendAsync(command);
-
-                if (result.IsFailure)
-                {
-                    break;
-                }
+                return batch.Count == 0 ? MpvSendResult.Success : await SendAsync(batch[0]);
             }
 
-            return result;
+            await _batchLock.WaitAsync();
+
+            try
+            {
+                var result = MpvSendResult.Success;
+
+                foreach (var command in batch)
+                {
+                    result = await SendAsync(command);
+
+                    if (result.IsFailure)
+                    {
+                        break;
+                    }
+                }
+
+                return result;
+            }
+            finally
+            {
+                _batchLock.Release();
+            }
         }
 
         /// <summary>

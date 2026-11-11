@@ -453,6 +453,48 @@ public class MpvClientTests
     }
 
     [Fact]
+    public async Task SendAsync_Batch_WhenAnotherBatchIsInProgress_WaitsForItInsteadOfInterleaving()
+    {
+        await using var mpv = await FakeMpv.StartAsync();
+
+        var firstBatch = mpv.Client.SendAsync([new("set", "pause", "yes"), new("seek", 0, "absolute")]);
+        var secondBatch = mpv.Client.SendAsync([new("set", "mute", "yes"), new("add", "volume", 5)]);
+
+        string[] expected = ["[\"set\",\"pause\",\"yes\"]", "[\"seek\",0,\"absolute\"]", "[\"set\",\"mute\",\"yes\"]", "[\"add\",\"volume\",5]"];
+
+        foreach (var command in expected)
+        {
+            var request = await mpv.ReadRequestAsync();
+            request.Command.ShouldBe(command);
+            await mpv.ReplyAsync(request.Id, "success");
+        }
+
+        (await firstBatch.WithTimeout()).ShouldBe(MpvSendResult.Success);
+        (await secondBatch.WithTimeout()).ShouldBe(MpvSendResult.Success);
+    }
+
+    [Fact]
+    public async Task SendAsync_Batch_WhenInProgress_DoesNotHoldBackASingleCommand()
+    {
+        await using var mpv = await FakeMpv.StartAsync();
+
+        var batch = mpv.Client.SendAsync([new("set", "pause", "yes"), new("seek", 0, "absolute")]);
+        var batchFirst = await mpv.ReadRequestAsync();
+
+        // The batch is still waiting for its first reply; a single command (given as a batch of one, as actions do) goes straight out.
+        var single = mpv.Client.SendAsync([new MpvCommand("add", "volume", 5)]);
+        var singleRequest = await mpv.ReadRequestAsync();
+        singleRequest.Command.ShouldBe("[\"add\",\"volume\",5]");
+        await mpv.ReplyAsync(singleRequest.Id, "success");
+        (await single.WithTimeout()).ShouldBe(MpvSendResult.Success);
+
+        await mpv.ReplyAsync(batchFirst.Id, "success");
+        var batchSecond = await mpv.ReadRequestAsync();
+        await mpv.ReplyAsync(batchSecond.Id, "success");
+        (await batch.WithTimeout()).ShouldBe(MpvSendResult.Success);
+    }
+
+    [Fact]
     public async Task SendAsync_Batch_WithNoCommands_ReturnsSuccess()
     {
         using var client = new MpvClient((_, _) => Task.FromResult<Stream?>(null));
