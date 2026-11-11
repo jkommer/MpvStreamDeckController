@@ -1,0 +1,8 @@
+{
+  "name": "mpv-streamdeck-controller-build",
+  "description": "Build tooling for the plugin. Not part of the plugin itself.",
+  "private": true,
+  "devDependencies": {
+    "@elgato/cli": "1.10.4"
+  }
+}

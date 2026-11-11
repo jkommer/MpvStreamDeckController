@@ -3,9 +3,20 @@ name: Build
 on:
   push:
     branches: [ "main" ]
+    # Pushing a version tag (e.g. v1.2.0) builds that version and creates a draft GitHub release for it.
+    tags: [ "v*" ]
   pull_request:
     branches: [ "main" ]
  
+permissions:
+  contents: read
+
+# A newer push to a pull request cancels the build of the older one. Builds of main and of tags always run to the end,
+# so a release is never cut off half way.
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: ${{ github.event_name == 'pull_request' }}
+
 env:
   PLUGIN_ID: com.jkommer.mpv
   PLUGIN_DIR: src/MpvStreamDeckController/bin/Release/com.jkommer.mpv.sdPlugin
@@ -13,45 +24,113 @@ env:
 jobs:
   build: 
     runs-on: windows-latest
+    timeout-minutes: 15
+    outputs:
+      artifact: ${{ env.PLUGIN_ID }}-${{ steps.version.outputs.semVer }}
+      version: ${{ steps.version.outputs.semVer }}
  
     steps:
     - uses: actions/checkout@v7
       with:
         fetch-depth: 0 
 
-    - name: Install GitVersion
-      uses: gittools/actions/gitversion/setup@v4.7.0
-      with:
-        versionSpec: '6.8.x'
-    - name: Determine version
-      id: gitversion
-      uses: gittools/actions/gitversion/execute@v4.7.0
-
     - name: Setup .NET
       uses: actions/setup-dotnet@v6
       with:
-        dotnet-version: 10.0.x
+        # The SDK version comes from global.json, so local and GitHub builds use the same one.
+        global-json-file: global.json
+    # GitVersion and ReportGenerator, at the versions pinned in .config/dotnet-tools.json.
+    - name: Restore .NET tools
+      run: dotnet tool restore
+
+    # On a tag build the version is the tag itself: GitVersion treats the tag ref as a branch and would calculate
+    # something like 1.2.1-tags-v1-2-0.1 for v1.2.0. Everywhere else GitVersion decides.
+    # "manifest" is the four-part version Stream Deck wants in manifest.json.
+    - name: Resolve version
+      id: version
+      run: |
+        if ($env:GITHUB_REF -like 'refs/tags/*') {
+          if ($env:GITHUB_REF_NAME -notmatch '^v(?<core>\d+\.\d+\.\d+)(?<pre>-[0-9A-Za-z.-]+)?$') {
+            Write-Error "Tag '$env:GITHUB_REF_NAME' is not a version. Use a tag like v1.2.0 or v1.2.0-beta.1."
+            exit 1
+          }
+          $semVer = $Matches.core + $Matches.pre
+          $manifest = $Matches.core + '.0'
+        } else {
+          $output = dotnet gitversion | Out-String
+          if ($LASTEXITCODE -ne 0) {
+            Write-Error "GitVersion failed (exit code $LASTEXITCODE):`n$output"
+            exit 1
+          }
+          $info = $output | ConvertFrom-Json
+          $semVer = $info.SemVer
+          $manifest = "$($info.MajorMinorPatch).$($info.VersionSourceDistance)"
+        }
+        "semVer=$semVer" >> $env:GITHUB_OUTPUT
+        "manifest=$manifest" >> $env:GITHUB_OUTPUT
+        Write-Host "Version: $semVer (manifest $manifest)"
+
     - name: Restore dependencies
       run: dotnet restore
+    # Whitespace and code style, as "dotnet format" would leave them. Run "dotnet format" locally to fix a failure.
+    - name: Check formatting
+      run: dotnet format --verify-no-changes --no-restore
+    # Warnings fail the GitHub build, so the code stays at zero warnings; local builds still only warn.
     - name: Build
-      run: dotnet build -c Release --no-restore -p:Version=${{ steps.gitversion.outputs.semVer }}
+      run: dotnet build -c Release --no-restore -warnaserror -p:Version=${{ steps.version.outputs.semVer }}
     - name: Test
-      run: dotnet test -c Release --no-build --verbosity normal 
+      run: dotnet test -c Release --no-build --verbosity normal --coverage --coverage-output-format cobertura --coverage-output "${{ runner.temp }}/coverage/coverage.cobertura.xml"
+    # Shown on the run's summary page. Informational only: nothing fails on a low number.
+    - name: Coverage summary
+      run: |
+        dotnet reportgenerator "-reports:${{ runner.temp }}/coverage/coverage.cobertura.xml" "-targetdir:${{ runner.temp }}/coverage/report" -reporttypes:MarkdownSummaryGithub
+        if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
+        Get-Content "${{ runner.temp }}/coverage/report/SummaryGithub.md" >> $env:GITHUB_STEP_SUMMARY
     
     - name: Setup Node.js
       uses: actions/setup-node@v7
       with:
         node-version: lts/*
+        cache: npm
+    # The Stream Deck CLI, at the version pinned in package.json.
     - name: Install Stream Deck CLI
-      run: npm install -g @elgato/cli@1.10.4
+      run: npm ci
     - name: Validate plugin
-      run: streamdeck validate "${{ env.PLUGIN_DIR }}" --no-update-check
+      run: npx streamdeck validate "${{ env.PLUGIN_DIR }}" --no-update-check
     - name: Pack plugin
-      run: streamdeck pack "${{ env.PLUGIN_DIR }}" --output dist --no-update-check --no-file-list --version "${{ steps.gitversion.outputs.majorMinorPatch }}.${{ steps.gitversion.outputs.versionSourceDistance }}"
+      run: npx streamdeck pack "${{ env.PLUGIN_DIR }}" --output dist --no-update-check --no-file-list --version "${{ steps.version.outputs.manifest }}"
     
     - name: Upload package
       uses: actions/upload-artifact@v7
       with:
-        name: ${{ env.PLUGIN_ID }}-${{ steps.gitversion.outputs.semVer }}
+        name: ${{ env.PLUGIN_ID }}-${{ steps.version.outputs.semVer }}
         path: dist/*.streamDeckPlugin
         if-no-files-found: error
+
+  release:
+    name: Draft release
+    if: startsWith(github.ref, 'refs/tags/v')
+    needs: build
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    permissions:
+      contents: write
+
+    steps:
+    - name: Download package
+      uses: actions/download-artifact@v8
+      with:
+        name: ${{ needs.build.outputs.artifact }}
+        path: dist
+
+    # Created as a draft, to be reviewed and published by hand. A version with a pre-release part (v1.2.0-beta.1) is
+    # marked as a pre-release.
+    - name: Create draft GitHub release
+      env:
+        GH_TOKEN: ${{ github.token }}
+        GH_REPO: ${{ github.repository }}
+        VERSION: ${{ needs.build.outputs.version }}
+      run: |
+        prerelease=""
+        case "$VERSION" in *-*) prerelease="--prerelease" ;; esac
+        gh release create "$GITHUB_REF_NAME" dist/*.streamDeckPlugin --title "$GITHUB_REF_NAME" --draft --generate-notes --verify-tag $prerelease

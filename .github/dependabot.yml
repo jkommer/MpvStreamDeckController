@@ -1,6 +1,18 @@
 version: 2
 updates:
+  # The actions used in .github/workflows.
   - package-ecosystem: "github-actions"
+    directory: "/"
+    schedule:
+      interval: "weekly"
+    open-pull-requests-limit: 10
+    groups:
+      github-actions:
+        patterns:
+          - "*"
+
+  # NuGet packages, and the .NET tools (GitVersion) in .config/dotnet-tools.json.
+  - package-ecosystem: "nuget"
     directory: "/"
     schedule:
       interval: "weekly"
@@ -10,12 +22,19 @@ updates:
         patterns:
           - "*"
 
-  - package-ecosystem: "nuget"
+  # The .NET SDK version in global.json.
+  - package-ecosystem: "dotnet-sdk"
+    directory: "/"
+    schedule:
+      interval: "weekly"
+
+  # Build tooling in package.json (the Stream Deck CLI).
+  - package-ecosystem: "npm"
     directory: "/"
     schedule:
       interval: "weekly"
     open-pull-requests-limit: 10
     groups:
-      dotnet:
+      npm:
         patterns:
           - "*"

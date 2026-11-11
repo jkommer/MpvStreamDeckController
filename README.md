@@ -20,11 +20,12 @@ keys and dials act on the running player directly and dials show live state such
 
 - Windows 10 or later
 - Stream Deck 6.4 or later
+- [.NET 10 Runtime](https://dotnet.microsoft.com/download/dotnet/10.0) (x64)
 - mpv
 
 ## Getting started
 
-1. Install the plugin.
+1. Download `com.jkommer.mpv.streamDeckPlugin` from the [latest release](https://github.com/jkommer/MpvStreamDeckController/releases/latest) and double-click it to install.
 2. Enable mpv's IPC server by adding this line to your `mpv.conf` (usually `%APPDATA%\mpv\mpv.conf`):
 
    ```
@@ -72,10 +73,23 @@ Unlike `input.conf`, the plugin doesn't show an OSD unless one is selected in th
 
 ## Building
 
-Requires the .NET 10 SDK, [GitVersion](https://gitversion.net) (`dotnet tool install --global GitVersion.Tool`) and
-the [Elgato CLI](https://docs.elgato.com/streamdeck/cli/intro) (`npm install -g @elgato/cli`).
+Requires the .NET 10 SDK (the version in `global.json` or a later 10.0 one) and [Node.js](https://nodejs.org). The build tools -
+[GitVersion](https://gitversion.net) and the [Elgato CLI](https://docs.elgato.com/streamdeck/cli/intro) - are pinned
+in the repository (`.config/dotnet-tools.json` and `package.json`) and installed by `dotnet tool restore` and `npm ci`.
 
 `build-and-deploy.ps1` builds and tests the plugin, validates and packs it, and reinstalls it into Stream Deck.
+
+### Releasing
+
+Pushing a version tag builds that version and creates a draft GitHub release with the plugin attached:
+
+```
+git tag v1.2.0
+git push origin v1.2.0
+```
+
+Review the draft on the repository's Releases page and publish it from there. A tag with a pre-release part, e.g.
+`v1.2.0-beta.1`, is marked as a pre-release.
 
 ## License
 

@@ -1,0 +1,13 @@
+<Project>
+  <PropertyGroup>
+    <!-- Report the code style rules in .editorconfig as build warnings, not only in the editor and in "dotnet format". -->
+    <EnforceCodeStyleInBuild>true</EnforceCodeStyleInBuild>
+
+    <!-- The unused-usings rule (IDE0005) only runs in a build when XML documentation is generated. Nothing here needs
+         the documentation file itself, so it stays out of the build output (and so out of the plugin package), and
+         missing-comment warnings (CS1591) are off. -->
+    <GenerateDocumentationFile>true</GenerateDocumentationFile>
+    <CopyDocumentationFileToOutputDirectory>false</CopyDocumentationFileToOutputDirectory>
+    <NoWarn>$(NoWarn);CS1591</NoWarn>
+  </PropertyGroup>
+</Project>
