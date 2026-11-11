@@ -1,0 +1,8 @@
+# Text files are stored with LF in the repository and checked out with CRLF, whatever the local Git settings.
+* text=auto eol=crlf
+
+*.png binary
+*.ico binary
+
+# Third-party, minified: keep byte for byte as shipped.
+src/MpvStreamDeckController/PropertyInspectors/sdpi-components.js -text

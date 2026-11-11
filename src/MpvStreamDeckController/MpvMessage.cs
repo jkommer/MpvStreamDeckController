@@ -4,6 +4,7 @@ namespace MpvStreamDeckController;
 public abstract record MpvMessage;
 
 /// <summary>A property-change event for an observed property.</summary>
+/// <param name="PropertyId">The id the property was observed with; see <see cref="MpvProperty.Id"/>.</param>
 /// <param name="Value">A double, bool, string, JsonElement (arrays/objects), or null when unavailable.</param>
 public sealed record MpvPropertyChange(long PropertyId, object? Value) : MpvMessage;
 

@@ -18,6 +18,8 @@ public enum MpvSendStatus
     NoReply,
 }
 
+/// <summary>The outcome of sending a command to mpv.</summary>
+/// <param name="Status">What happened to the command.</param>
 /// <param name="Error">mpv's error message when <see cref="Status"/> is <see cref="MpvSendStatus.Rejected"/>.</param>
 public readonly record struct MpvSendResult(MpvSendStatus Status, string? Error = null)
 {

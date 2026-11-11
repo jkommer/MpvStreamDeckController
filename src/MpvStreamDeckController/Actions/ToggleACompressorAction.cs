@@ -1,4 +1,4 @@
-﻿using BarRaider.SdTools;
+using BarRaider.SdTools;
 
 namespace MpvStreamDeckController.Actions;
 
@@ -9,7 +9,7 @@ public class ToggleACompressorAction(ISDConnection connection, InitialPayload pa
 
     protected override KeyFeedback GetFeedback(MpvState state)
     {
-        var iconState = state.Flag(MpvProperties.ACompressor) ?? false ? (uint) 1 : 0;
-        return new (iconState, null);
+        var iconState = state.Flag(MpvProperties.ACompressor) ?? false ? (uint)1 : 0;
+        return new(iconState, null);
     }
 }

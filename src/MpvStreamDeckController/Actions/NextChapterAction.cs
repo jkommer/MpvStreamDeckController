@@ -1,4 +1,4 @@
-﻿using BarRaider.SdTools;
+using BarRaider.SdTools;
 
 namespace MpvStreamDeckController.Actions;
 

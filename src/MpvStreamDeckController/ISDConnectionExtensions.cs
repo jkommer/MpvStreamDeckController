@@ -1,11 +1,13 @@
-﻿using BarRaider.SdTools;
 using System.Runtime.CompilerServices;
+using BarRaider.SdTools;
 
-namespace MpvStreamDeckController
+namespace MpvStreamDeckController;
+
+public static class ISDConnectionExtensions
 {
-    public static class MpvCommandExtensions
+    extension(ISDConnection connection)
     {
-        public static async Task SendCommandsAsync(this ISDConnection connection, IEnumerable<MpvCommand>? commands, [CallerMemberName] string caller = "")
+        public async Task SendCommandsAsync(IEnumerable<MpvCommand>? commands, [CallerMemberName] string caller = "")
         {
             try
             {

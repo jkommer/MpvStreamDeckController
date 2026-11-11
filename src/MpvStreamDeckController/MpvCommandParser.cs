@@ -1,4 +1,4 @@
-﻿// C# port of the command-string tokenizer used for mpv's input.conf commands by Claude Code then manually edited for readability. 
+// C# port of the command-string tokenizer used for mpv's input.conf commands by Claude Code then manually edited for readability. 
 //
 // Ported from mpv master:
 //   input/cmd.c      read_token(), pctx_read_token(), parse_cmd_str() (tokenizing part),
@@ -59,7 +59,7 @@ public static class MpvCommandParser
             error = cursor.Error ?? "Unknown error.";
             return false;
         }
-        
+
         commands.Add(firstCommand);
 
         // "Handle multi commands": keep going while we see ';' followed by something that looks like a token.
@@ -73,7 +73,7 @@ public static class MpvCommandParser
             }
 
             // eat ';' (mpv eats it even if the loop then stops)
-            cursor.Position++; 
+            cursor.Position++;
 
             if (!TryReadPlainToken(text, cursor.Position, out _, out _))
             {
@@ -120,13 +120,13 @@ public static class MpvCommandParser
         cursor.SkipWhitespace();
 
         var tokens = new List<string>();
-        var result = ReadToken(cursor, out string token);
+        var result = ReadToken(cursor, out var token);
 
         if (result is TokenResult.Error)
         {
             return null;
         }
-        
+
         if (result is TokenResult.Exhausted)
         {
             cursor.Error = "Command name missing.";
@@ -138,17 +138,17 @@ public static class MpvCommandParser
         while (true)
         {
             result = ReadToken(cursor, out token);
-            
+
             if (result is TokenResult.Error)
             {
                 cursor.Error = $"Command {tokens[0]}: error in argument {tokens.Count}. {cursor.Error}";
                 return null;
             }
-            
+
             if (result is TokenResult.Exhausted)
             {
                 // hit ';', '#' or end of input
-                break; 
+                break;
             }
 
             tokens.Add(token);
@@ -163,7 +163,7 @@ public static class MpvCommandParser
     private static bool TryReadPlainToken(string text, int position, out int start, out int end)
     {
         start = position;
-        
+
         while (start < text.Length && IsWhitespace(text[start]))
         {
             start++;
@@ -183,7 +183,7 @@ public static class MpvCommandParser
     {
         Error = -1,
         Exhausted = 0,
-        TokenRead = 1        
+        TokenRead = 1
     }
 
     /// <summary>
@@ -200,21 +200,21 @@ public static class MpvCommandParser
         // "double quoted" with C-style escapes
         if (cursor.Eat('"'))
         {
-            var bufffer = new Utf8Buffer();
+            var buffer = new Utf8Buffer();
 
-            if (!AppendEscapedString(cursor, bufffer))
+            if (!AppendEscapedString(cursor, buffer))
             {
                 cursor.Error = $"Broken string escapes: ...>{text[start..]}<.";
                 return TokenResult.Error;
             }
-            
+
             if (!cursor.Eat('"'))
             {
                 cursor.Error = $"Unterminated double quote: ...>{text[start..]}<.";
                 return TokenResult.Error;
             }
-            
-            token = bufffer.ToString();
+
+            token = buffer.ToString();
             return TokenResult.TokenRead;
         }
 
@@ -250,9 +250,9 @@ public static class MpvCommandParser
             var delimiter = text[cursor.Position];
             cursor.Position++;
             string endQuote = new([delimiter, '`']);
-            
+
             var next = text.IndexOf(endQuote, cursor.Position, StringComparison.Ordinal);
-            
+
             if (next < 0)
             {
                 cursor.Error = $"Unterminated custom quote: ...>{text[start..]}<.";
@@ -265,7 +265,7 @@ public static class MpvCommandParser
         }
 
         // Unquoted. Quotes are only special at the *start* of a token, so a"b c"d yields the two tokens  a"b  and  c"d.
-        if (TryReadPlainToken(text, cursor.Position, out int tokStart, out int tokEnd))
+        if (TryReadPlainToken(text, cursor.Position, out var tokStart, out var tokEnd))
         {
             token = text[tokStart..tokEnd];
             cursor.Position = tokEnd;
@@ -347,12 +347,12 @@ public static class MpvCommandParser
         // \xHH: appends ONE RAW BYTE (not a code point), so "\xc3\xa9" is the two bytes of UTF-8 "é". Utf8Buffer decodes at the end to preserve that.
         if (text[position] == 'x' && remaining >= 3)
         {
-            if (!TryParseHex(text, position + 1, 2, out uint @byte))
+            if (!TryParseHex(text, position + 1, 2, out var @byte))
             {
                 return false;
             }
 
-            destination.AppendByte((byte) @byte);
+            destination.AppendByte((byte)@byte);
             position += 3;
             return true;
         }
@@ -360,7 +360,7 @@ public static class MpvCommandParser
         // \uXXXX, with a following \uXXXX required after a high surrogate.
         if (text[position] == 'u' && remaining >= 5)
         {
-            if (!TryParseHex(text, position + 1, 4, out uint codePoint))
+            if (!TryParseHex(text, position + 1, 4, out var codePoint))
             {
                 return false;
             }
@@ -372,7 +372,7 @@ public static class MpvCommandParser
                 {
                     return false;
                 }
-                if (!TryParseHex(text, position + 7, 4, out uint c2) || c2 < 0xDC00 || c2 > 0xDFFF)
+                if (!TryParseHex(text, position + 7, 4, out var c2) || c2 < 0xDC00 || c2 > 0xDFFF)
                 {
                     return false;
                 }
@@ -400,13 +400,13 @@ public static class MpvCommandParser
     private static bool TryParseHex(string text, int position, int count, out uint value)
     {
         value = 0;
-        
+
         if (position + count > text.Length)
         {
             return false;
         }
-        
-        for (int i = 0; i < count; i++)
+
+        for (var i = 0; i < count; i++)
         {
             var chr = text[position + i];
 

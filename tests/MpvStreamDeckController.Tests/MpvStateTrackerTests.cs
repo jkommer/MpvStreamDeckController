@@ -1,5 +1,5 @@
-﻿using Shouldly;
 using System.Text.Json;
+using Shouldly;
 
 namespace MpvStreamDeckController.Tests;
 
@@ -285,7 +285,7 @@ public class MpvStateTrackerTests
             .ShouldBe(expectedDuration);
 
         stateTracker.RegisterPropertyChange(MpvProperties.Duration.Id, nextExpectedDuration);
-        
+
         // Verify state updates on subsequent calls.
         invocations.ShouldBe(2);
         receivedDuration.ShouldBe(nextExpectedDuration);

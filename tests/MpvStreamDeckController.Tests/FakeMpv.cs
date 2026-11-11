@@ -231,7 +231,7 @@ internal sealed class FakeMpv : IAsyncDisposable
         public override async Task WriteAsync(byte[] buffer, int offset, int count, CancellationToken cancellationToken)
         {
             await beforeWrite(cancellationToken);
-            await inner.WriteAsync(buffer, offset, count, cancellationToken);
+            await inner.WriteAsync(buffer.AsMemory(offset, count), cancellationToken);
         }
 
         public override async ValueTask WriteAsync(ReadOnlyMemory<byte> buffer, CancellationToken cancellationToken = default)

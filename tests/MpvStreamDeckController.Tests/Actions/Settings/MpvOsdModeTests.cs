@@ -27,7 +27,7 @@ public class MpvOsdModeTests
     }
 
     [Theory]
-    [InlineData((string?) null)]
+    [InlineData((string?)null)]
     [InlineData("")]
     [InlineData("osd")]
     [InlineData("raw")]

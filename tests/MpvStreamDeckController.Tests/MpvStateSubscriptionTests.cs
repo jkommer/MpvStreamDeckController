@@ -4,7 +4,7 @@ namespace MpvStreamDeckController.Tests;
 
 public class MpvStateSubscriptionTests
 {
-    private static readonly MpvProperty Volume = MpvProperties.Volume;
+    private static readonly MpvProperty _volume = MpvProperties.Volume;
 
     [Fact]
     public void Constructor_AppliesTheCurrentState()
@@ -15,7 +15,7 @@ public class MpvStateSubscriptionTests
         using var _ = Subscribe(source, feedback);
 
         feedback.ShouldBe([10]);
-        source.ObservedProperties.ShouldBe([Volume]);
+        source.ObservedProperties.ShouldBe([_volume]);
     }
 
     [Fact]
@@ -87,17 +87,15 @@ public class MpvStateSubscriptionTests
     }
 
     private static MpvStateSubscription<Feedback> Subscribe(FakeStateSource source, List<double?> feedback)
-        => new(source, [Volume], state => new Feedback(state.Number(Volume)), f => feedback.Add(f.Volume));
+        => new(source, [_volume], state => new Feedback(state.Number(_volume)), f => feedback.Add(f.Volume));
 
     private static MpvState CreateVolumeState(long version, double volume)
-        => new(version, true, new Dictionary<long, object> { [Volume.Id] = volume });
+        => new(version, true, new Dictionary<long, object> { [_volume.Id] = volume });
 
     private readonly record struct Feedback(double? Volume);
 
     private sealed class FakeStateSource : IMpvStateSource
     {
-        private MpvState _state = MpvState.Inactive;
-
         public List<MpvProperty> ObservedProperties { get; } = [];
 
         /// <summary>Runs (once) when State is read, to simulate a state change landing straight after the read.</summary>
@@ -107,20 +105,20 @@ public class MpvStateSubscriptionTests
         {
             get
             {
-                var state = _state;
+                var state = field;
                 var onRead = OnStateRead;
                 OnStateRead = null;
                 onRead?.Invoke();
                 return state;
             }
-            set => _state = value;
-        }
+            set;
+        } = MpvState.Inactive;
 
         public event Action<MpvState>? StateChanged;
 
         public void Raise(MpvState state)
         {
-            _state = state;
+            State = state;
             StateChanged?.Invoke(state);
         }
 

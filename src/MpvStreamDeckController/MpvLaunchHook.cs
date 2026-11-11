@@ -18,6 +18,8 @@ public static class MpvLaunchHook
     public static void EnsureAttached(ISDConnection connection)
     {
         if (Interlocked.Exchange(ref _attached, 1) == 0)
+        {
             connection.StreamDeckConnection.OnApplicationDidLaunch += (_, _) => MpvClient.Instance.NotifyMpvLaunched();
+        }
     }
 }

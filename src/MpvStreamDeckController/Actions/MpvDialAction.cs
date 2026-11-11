@@ -42,12 +42,12 @@ public abstract class MpvDialAction : KeyAndEncoderBase
     public override void DialUp(DialPayload payload) { }
 
     public override void TouchPress(TouchpadPressPayload payload) => SendCommands(PressCommands);
-    
+
     public override void KeyPressed(KeyPayload payload) { }
     public override void KeyReleased(KeyPayload payload) { }
-    
+
     public override void OnTick() { }
-    
+
     public override void ReceivedGlobalSettings(ReceivedGlobalSettingsPayload payload) { }
     public sealed override void ReceivedSettings(ReceivedSettingsPayload payload)
     {
@@ -59,7 +59,7 @@ public abstract class MpvDialAction : KeyAndEncoderBase
     protected virtual void OnSettingsChanged(JObject? settings) { }
 
     private void SendCommands(MpvCommand[]? commands) => _ = Connection.SendCommandsAsync(_settings.Apply(commands));
-    
+
     private void OnFeedbackChanged(DialFeedback feedback) => _ = SetFeedbackAsync(feedback);
 
     private async Task SetFeedbackAsync(DialFeedback feedback)

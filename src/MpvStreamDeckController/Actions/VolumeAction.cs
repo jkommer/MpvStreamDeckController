@@ -6,7 +6,7 @@ using Newtonsoft.Json.Linq;
 namespace MpvStreamDeckController.Actions;
 
 [PluginActionId("com.jkommer.mpv.volume")]
-public class VolumeAction : MpvDialAction
+public class VolumeAction(ISDConnection connection, InitialPayload payload) : MpvDialAction(connection, payload, [MpvProperties.Volume, MpvProperties.VolumeMax, MpvProperties.Mute])
 {
     private const double DefaultVolumeMax = 100;
 
@@ -14,13 +14,7 @@ public class VolumeAction : MpvDialAction
     private const string VolumeIcon = "Images/dial/11a_volume_dial";
     private const string MutedIcon = "Images/dial/11b_volume_muted_dial";
 
-    private volatile VolumeSettings _volumeSettings;
-
-    public VolumeAction(ISDConnection connection, InitialPayload payload)
-        : base(connection, payload, [MpvProperties.Volume, MpvProperties.VolumeMax, MpvProperties.Mute])
-    {
-        _volumeSettings = VolumeSettings.Read(payload.Settings);
-    }
+    private volatile VolumeSettings _volumeSettings = VolumeSettings.Read(payload.Settings);
 
     protected override MpvCommand[] RotateCommands(int ticks) => [_volumeSettings.CreateCommand(ticks)];
 

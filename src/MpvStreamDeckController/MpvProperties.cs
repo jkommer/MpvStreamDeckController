@@ -13,8 +13,8 @@ public sealed record MpvProperty(long Id, string Name, Func<double, double>? Qua
 
 public static class MpvProperties
 {
-    private static long currentId = 1;
-    private static readonly Dictionary<long, MpvProperty> CreatedProperties = [];
+    private static long _currentId = 1;
+    private static readonly Dictionary<long, MpvProperty> _createdProperties = [];
 
     public static readonly MpvProperty TimePos = Create("time-pos", Math.Floor);
     public static readonly MpvProperty Duration = Create("duration", Math.Floor);
@@ -24,7 +24,7 @@ public static class MpvProperties
     public static readonly MpvProperty Pause = Create("pause");
     public static readonly MpvProperty ACompressor = Create("af", fromJson: FilterEnabled("acompressor"));
 
-    public static IReadOnlyDictionary<long, MpvProperty> All => CreatedProperties;
+    public static IReadOnlyDictionary<long, MpvProperty> All => _createdProperties;
 
     /// <summary>
     /// One decimal, so a dial stepping by e.g. 0.5 shows every step. Halves round up rather than to the nearest even digit, which is Math.Round's default.
@@ -33,10 +33,10 @@ public static class MpvProperties
 
     private static MpvProperty Create(string name, Func<double, double>? quantize = null, Func<JsonElement, object?>? fromJson = null)
     {
-        var propertyId = currentId++;
+        var propertyId = _currentId++;
 
         var property = new MpvProperty(propertyId, name, quantize, fromJson);
-        CreatedProperties.Add(propertyId, property);
+        _createdProperties.Add(propertyId, property);
         return property;
     }
 

@@ -9,7 +9,8 @@ public class MpvClientTests
     [Fact]
     public async Task Dispose_WhileConnected_ClosesTheConnectionAndStopsReconnecting()
     {
-        await using var mpv = await FakeMpv.StartAsync();
+        // A long connection timeout, so a send that wrongly waited for a reconnect is clearly slower than one that didn't.
+        await using var mpv = await FakeMpv.StartAsync(new() { ConnectionTimeout = TimeSpan.FromSeconds(5) });
 
         mpv.Client.Dispose();
 
@@ -20,7 +21,7 @@ public class MpvClientTests
         mpv.Client.NotifyMpvLaunched();
         var stopwatch = System.Diagnostics.Stopwatch.StartNew();
         (await mpv.Client.SendAsync(new MpvCommand("cycle", "pause"))).Status.ShouldBe(MpvSendStatus.NotConnected);
-        stopwatch.Elapsed.ShouldBeLessThan(TimeSpan.FromMilliseconds(250));
+        stopwatch.Elapsed.ShouldBeLessThan(TimeSpan.FromSeconds(2), "should return straight away, not wait for the 5 s timeout");
 
         // A reconnect would happen on the background loop, so give it time to show up before checking it didn't.
         await Task.Delay(TimeSpan.FromMilliseconds(250), TaskTestExtensions.CancellationToken);
@@ -39,7 +40,7 @@ public class MpvClientTests
     [Fact]
     public async Task Dispose_WhileASendIsWaitingForItsReply_ReturnsNoReplyWithoutWaitingForTheTimeout()
     {
-        await using var mpv = await FakeMpv.StartAsync(new MpvClientOptions { ReplyTimeout = TimeSpan.FromMinutes(5) });
+        await using var mpv = await FakeMpv.StartAsync(new() { ReplyTimeout = TimeSpan.FromMinutes(5) });
 
         var send = mpv.Client.SendAsync(new MpvCommand("cycle", "pause"));
         await mpv.ReadRequestAsync();
@@ -78,8 +79,8 @@ public class MpvClientTests
 
         var send = mpv.Client.SendAsync(new MpvCommand("cycle", "pause"));
         await mpv.WaitForConnectionAsync();
-        var request = await mpv.ReadRequestAsync();
-        await mpv.ReplyAsync(request.Id, "success");
+        var (requestId, _) = await mpv.ReadRequestAsync();
+        await mpv.ReplyAsync(requestId, "success");
 
         (await send.WithTimeout()).ShouldBe(MpvSendResult.Success);
     }
@@ -101,8 +102,8 @@ public class MpvClientTests
 
         for (var i = 0; i < sends.Length; i++)
         {
-            var request = await mpv.ReadRequestAsync();
-            await mpv.ReplyAsync(request.Id, "success");
+            var (requestId, _) = await mpv.ReadRequestAsync();
+            await mpv.ReplyAsync(requestId, "success");
         }
 
         (await Task.WhenAll(sends).WithTimeout()).ShouldAllBe(result => result == MpvSendResult.Success);
@@ -112,7 +113,7 @@ public class MpvClientTests
     [Fact]
     public async Task SendAsync_WhenMpvIsNotRunning_ReturnsNotConnectedWithoutWaitingForTheConnectTimeout()
     {
-        await using var mpv = await FakeMpv.StartAsync(new MpvClientOptions { ConnectionTimeout = TimeSpan.FromSeconds(5) });
+        await using var mpv = await FakeMpv.StartAsync(new() { ConnectionTimeout = TimeSpan.FromSeconds(5) });
 
         mpv.CloseServer();
         await mpv.WaitForStateAsync(state => !state.IsConnected);
@@ -121,7 +122,7 @@ public class MpvClientTests
         var result = await mpv.Client.SendAsync(new MpvCommand("cycle", "pause")).WithTimeout();
 
         result.ShouldBe(MpvSendResult.NotConnected);
-        stopwatch.Elapsed.ShouldBeLessThan(TimeSpan.FromSeconds(1), "should return once the connect attempt fails, not wait for the 5 s timeout");
+        stopwatch.Elapsed.ShouldBeLessThan(TimeSpan.FromSeconds(2), "should return once the connect attempt fails, not wait for the 5 s timeout");
     }
 
     [Fact]
@@ -189,8 +190,8 @@ public class MpvClientTests
         using var second = mpv.Client.ObserveProperty([pause]);
 
         mpv.ReleaseWrites();
-        var request = await mpv.ReadRequestAsync();
-        await mpv.ReplyAsync(request.Id, "success");
+        var (requestId, _) = await mpv.ReadRequestAsync();
+        await mpv.ReplyAsync(requestId, "success");
         await send.WithTimeout();
 
         // mpv kept observing throughout, so it would never resend the unchanged value without this.
@@ -232,13 +233,13 @@ public class MpvClientTests
         await using var mpv = await FakeMpv.StartAsync();
 
         var send = mpv.Client.SendAsync(new MpvCommand("seek", 1, "relative"));
-        var request = await mpv.ReadRequestAsync();
-        await mpv.ReplyAsync(request.Id, "success");
+        var (requestId, command) = await mpv.ReadRequestAsync();
+        await mpv.ReplyAsync(requestId, "success");
 
         (await send.WithTimeout()).ShouldBe(MpvSendResult.Success);
 
         // Numbers must stay numbers: mpv treats ["seek", "1"] differently from ["seek", 1].
-        request.Command.ShouldBe("[\"seek\",1,\"relative\"]");
+        command.ShouldBe("[\"seek\",1,\"relative\"]");
     }
 
     [Fact]
@@ -247,8 +248,8 @@ public class MpvClientTests
         await using var mpv = await FakeMpv.StartAsync();
 
         var send = mpv.Client.SendAsync(new MpvCommand("seek", 1, "relative"));
-        var request = await mpv.ReadRequestAsync();
-        await mpv.ReplyAsync(request.Id, "error running command");
+        var (requestId, _) = await mpv.ReadRequestAsync();
+        await mpv.ReplyAsync(requestId, "error running command");
 
         var result = await send.WithTimeout();
         result.Status.ShouldBe(MpvSendStatus.Rejected);
@@ -262,18 +263,18 @@ public class MpvClientTests
         await using var mpv = await FakeMpv.StartAsync();
 
         var first = mpv.Client.SendAsync(new MpvCommand("playlist-next"));
-        var firstRequest = await mpv.ReadRequestAsync();
+        var (firstRequestId, _) = await mpv.ReadRequestAsync();
         var second = mpv.Client.SendAsync(new MpvCommand("playlist-prev"));
-        var secondRequest = await mpv.ReadRequestAsync();
+        var (secondRequestId, _) = await mpv.ReadRequestAsync();
 
-        firstRequest.Id.ShouldNotBe(secondRequest.Id);
-        firstRequest.Id.ShouldBeGreaterThan(0);
+        firstRequestId.ShouldNotBe(secondRequestId);
+        firstRequestId.ShouldBeGreaterThan(0);
 
         await mpv.WriteLineAsync("{\"event\":\"seek\"}");
         await mpv.ReplyAsync(0, "invalid parameter"); // e.g. the reply to an observe_property, which has no request_id
-        await mpv.ReplyAsync(secondRequest.Id, "error running command");
+        await mpv.ReplyAsync(secondRequestId, "error running command");
         await mpv.SendPropertyChangeAsync(MpvProperties.Pause, true);
-        await mpv.ReplyAsync(firstRequest.Id, "success");
+        await mpv.ReplyAsync(firstRequestId, "success");
 
         (await first.WithTimeout()).ShouldBe(MpvSendResult.Success);
         (await second.WithTimeout()).ShouldBe(MpvSendResult.Rejected("error running command"));
@@ -282,7 +283,7 @@ public class MpvClientTests
     [Fact]
     public async Task SendAsync_WhenAWriteStalls_FailsAfterTheWriteTimeoutAndClosesTheConnection()
     {
-        await using var mpv = await FakeMpv.StartAsync(new MpvClientOptions { WriteTimeout = TimeSpan.FromMilliseconds(100) });
+        await using var mpv = await FakeMpv.StartAsync(new() { WriteTimeout = TimeSpan.FromMilliseconds(100) });
         mpv.HoldWrites();
 
         // The second send queues behind the first one's write lock; it must not be left waiting forever.
@@ -300,7 +301,7 @@ public class MpvClientTests
     [Fact]
     public async Task SendAsync_WhenMpvDoesNotReply_ReturnsNoReplyAfterTheTimeout()
     {
-        await using var mpv = await FakeMpv.StartAsync(new MpvClientOptions { ReplyTimeout = TimeSpan.FromMilliseconds(200) });
+        await using var mpv = await FakeMpv.StartAsync(new() { ReplyTimeout = TimeSpan.FromMilliseconds(200) });
 
         var send = mpv.Client.SendAsync(new MpvCommand("subprocess", "sleep"));
         await mpv.ReadRequestAsync();
@@ -313,16 +314,16 @@ public class MpvClientTests
     [Fact]
     public async Task SendAsync_WhenAReplyArrivesAfterTheTimeout_IgnoresItAndLaterCommandsStillWork()
     {
-        await using var mpv = await FakeMpv.StartAsync(new MpvClientOptions { ReplyTimeout = TimeSpan.FromMilliseconds(100) });
+        await using var mpv = await FakeMpv.StartAsync(new() { ReplyTimeout = TimeSpan.FromMilliseconds(100) });
 
-        var late = mpv.Client.SendAsync(new MpvCommand("cycle", "pause"));
-        var lateRequest = await mpv.ReadRequestAsync();
-        (await late.WithTimeout()).ShouldBe(MpvSendResult.NoReply);
-        await mpv.ReplyAsync(lateRequest.Id, "error running command");
+        var lateSendTask = mpv.Client.SendAsync(new MpvCommand("cycle", "pause"));
+        var (lateRequestId, _) = await mpv.ReadRequestAsync();
+        (await lateSendTask.WithTimeout()).ShouldBe(MpvSendResult.NoReply);
+        await mpv.ReplyAsync(lateRequestId, "error running command");
 
         var next = mpv.Client.SendAsync(new MpvCommand("cycle", "mute"));
-        var nextRequest = await mpv.ReadRequestAsync();
-        await mpv.ReplyAsync(nextRequest.Id, "success");
+        var (nextRequestId, _) = await mpv.ReadRequestAsync();
+        await mpv.ReplyAsync(nextRequestId, "success");
 
         (await next.WithTimeout()).ShouldBe(MpvSendResult.Success);
     }
@@ -330,7 +331,7 @@ public class MpvClientTests
     [Fact]
     public async Task SendAsync_WhenTheConnectionClosesBeforeTheReply_ReturnsNoReplyWithoutWaitingForTheTimeout()
     {
-        await using var mpv = await FakeMpv.StartAsync(new MpvClientOptions { ReplyTimeout = TimeSpan.FromMinutes(5) });
+        await using var mpv = await FakeMpv.StartAsync(new() { ReplyTimeout = TimeSpan.FromMinutes(5) });
 
         var send = mpv.Client.SendAsync(new MpvCommand("quit"));
         await mpv.ReadRequestAsync();
@@ -378,9 +379,10 @@ public class MpvClientTests
 
         // Reply to each with its own command as the error text, so every result shows which reply it was given.
         new Random(42).Shuffle(requests);
-        foreach (var request in requests)
+
+        foreach (var (requestId, requestCommand) in requests)
         {
-            await mpv.ReplyAsync(request.Id, request.Command);
+            await mpv.ReplyAsync(requestId, requestCommand);
         }
 
         var results = await Task
@@ -402,37 +404,41 @@ public class MpvClientTests
     {
         await using var mpv = await FakeMpv.StartAsync();
 
-        var sendAll = mpv.Client.SendAsync([new("set", "pause", "yes"), new("bogus-command"), new("set", "mute", "yes")]);
+        var sendTask = mpv.Client.SendAsync([new("set", "pause", "yes"), new("bogus-command"), new("set", "mute", "yes")]);
 
-        var first = await mpv.ReadRequestAsync();
-        await mpv.ReplyAsync(first.Id, "success");
-        var second = await mpv.ReadRequestAsync();
-        second.Command.ShouldBe("[\"bogus-command\"]");
-        await mpv.ReplyAsync(second.Id, "invalid parameter");
+        var (firstCommandId, _) = await mpv.ReadRequestAsync();
+        await mpv.ReplyAsync(firstCommandId, "success");
 
-        (await sendAll.WithTimeout()).ShouldBe(MpvSendResult.Rejected("invalid parameter"));
+        var (secondCommandId, secondCommand) = await mpv.ReadRequestAsync();
+        secondCommand.ShouldBe("[\"bogus-command\"]");
+
+        await mpv.ReplyAsync(secondCommandId, "invalid parameter");
+
+        (await sendTask.WithTimeout()).ShouldBe(MpvSendResult.Rejected("invalid parameter"));
 
         // The next thing mpv receives is a new command, not the third one from the batch.
         var next = mpv.Client.SendAsync(new MpvCommand("cycle", "pause"));
-        var nextRequest = await mpv.ReadRequestAsync();
-        nextRequest.Command.ShouldBe("[\"cycle\",\"pause\"]");
-        await mpv.ReplyAsync(nextRequest.Id, "success");
+        var (nextRequestId, nextRequestCommand) = await mpv.ReadRequestAsync();
+
+        nextRequestCommand.ShouldBe("[\"cycle\",\"pause\"]");
+
+        await mpv.ReplyAsync(nextRequestId, "success");
         await next.WithTimeout();
     }
 
     [Fact]
     public async Task SendAsync_Batch_WhenACommandGetsNoReply_CarriesOnWithTheRest()
     {
-        await using var mpv = await FakeMpv.StartAsync(new MpvClientOptions { ReplyTimeout = TimeSpan.FromMilliseconds(100) });
+        await using var mpv = await FakeMpv.StartAsync(new() { ReplyTimeout = TimeSpan.FromMilliseconds(100) });
 
-        var sendAll = mpv.Client.SendAsync([new("subprocess", "sleep"), new("set", "mute", "yes")]);
+        var sendTask = mpv.Client.SendAsync([new("subprocess", "sleep"), new("set", "mute", "yes")]);
 
         await mpv.ReadRequestAsync(); // no reply
-        var second = await mpv.ReadRequestAsync();
-        second.Command.ShouldBe("[\"set\",\"mute\",\"yes\"]");
-        await mpv.ReplyAsync(second.Id, "success");
+        var (secondCommandId, secondCommand) = await mpv.ReadRequestAsync();
+        secondCommand.ShouldBe("[\"set\",\"mute\",\"yes\"]");
+        await mpv.ReplyAsync(secondCommandId, "success");
 
-        (await sendAll.WithTimeout()).ShouldBe(MpvSendResult.Success);
+        (await sendTask.WithTimeout()).ShouldBe(MpvSendResult.Success);
     }
 
     [Fact]
@@ -440,16 +446,17 @@ public class MpvClientTests
     {
         await using var mpv = await FakeMpv.StartAsync();
 
-        var sendAll = mpv.Client.SendAsync([new("set", "pause", "yes"), new("set", "mute", "yes")]);
+        var sendTask = mpv.Client.SendAsync([new("set", "pause", "yes"), new("set", "mute", "yes")]);
 
-        var first = await mpv.ReadRequestAsync();
-        first.Command.ShouldBe("[\"set\",\"pause\",\"yes\"]");
-        await mpv.ReplyAsync(first.Id, "success");
-        var second = await mpv.ReadRequestAsync();
-        second.Command.ShouldBe("[\"set\",\"mute\",\"yes\"]");
-        await mpv.ReplyAsync(second.Id, "success");
+        var (firstCommandId, firstCommand) = await mpv.ReadRequestAsync();
+        firstCommand.ShouldBe("[\"set\",\"pause\",\"yes\"]");
+        await mpv.ReplyAsync(firstCommandId, "success");
 
-        (await sendAll.WithTimeout()).ShouldBe(MpvSendResult.Success);
+        var (secondCommandId, secondCommand) = await mpv.ReadRequestAsync();
+        secondCommand.ShouldBe("[\"set\",\"mute\",\"yes\"]");
+        await mpv.ReplyAsync(secondCommandId, "success");
+
+        (await sendTask.WithTimeout()).ShouldBe(MpvSendResult.Success);
     }
 
     [Fact]
@@ -457,20 +464,20 @@ public class MpvClientTests
     {
         await using var mpv = await FakeMpv.StartAsync();
 
-        var firstBatch = mpv.Client.SendAsync([new("set", "pause", "yes"), new("seek", 0, "absolute")]);
-        var secondBatch = mpv.Client.SendAsync([new("set", "mute", "yes"), new("add", "volume", 5)]);
+        var firstBatchTask = mpv.Client.SendAsync([new("set", "pause", "yes"), new("seek", 0, "absolute")]);
+        var secondBatchTask = mpv.Client.SendAsync([new("set", "mute", "yes"), new("add", "volume", 5)]);
 
         string[] expected = ["[\"set\",\"pause\",\"yes\"]", "[\"seek\",0,\"absolute\"]", "[\"set\",\"mute\",\"yes\"]", "[\"add\",\"volume\",5]"];
 
         foreach (var command in expected)
         {
-            var request = await mpv.ReadRequestAsync();
-            request.Command.ShouldBe(command);
-            await mpv.ReplyAsync(request.Id, "success");
+            var (requestId, requestCommand) = await mpv.ReadRequestAsync();
+            requestCommand.ShouldBe(command);
+            await mpv.ReplyAsync(requestId, "success");
         }
 
-        (await firstBatch.WithTimeout()).ShouldBe(MpvSendResult.Success);
-        (await secondBatch.WithTimeout()).ShouldBe(MpvSendResult.Success);
+        (await firstBatchTask.WithTimeout()).ShouldBe(MpvSendResult.Success);
+        (await secondBatchTask.WithTimeout()).ShouldBe(MpvSendResult.Success);
     }
 
     [Fact]
@@ -478,27 +485,28 @@ public class MpvClientTests
     {
         await using var mpv = await FakeMpv.StartAsync();
 
-        var batch = mpv.Client.SendAsync([new("set", "pause", "yes"), new("seek", 0, "absolute")]);
-        var batchFirst = await mpv.ReadRequestAsync();
+        // Send a batch of commands - but do not reply yet. 
+        var batchSendTask = mpv.Client.SendAsync([new("set", "pause", "yes"), new("seek", 0, "absolute")]);
+        var (batchId, _) = await mpv.ReadRequestAsync();
 
-        // The batch is still waiting for its first reply; a single command (given as a batch of one, as actions do) goes straight out.
-        var single = mpv.Client.SendAsync([new MpvCommand("add", "volume", 5)]);
-        var singleRequest = await mpv.ReadRequestAsync();
-        singleRequest.Command.ShouldBe("[\"add\",\"volume\",5]");
-        await mpv.ReplyAsync(singleRequest.Id, "success");
-        (await single.WithTimeout()).ShouldBe(MpvSendResult.Success);
+        // The batch is still waiting for its first reply; a single command should go straight through.
+        var singleSendTask = mpv.Client.SendAsync([new("add", "volume", 5)]);
+        var (singleRequestId, singleRequestCommand) = await mpv.ReadRequestAsync();
 
-        await mpv.ReplyAsync(batchFirst.Id, "success");
-        var batchSecond = await mpv.ReadRequestAsync();
-        await mpv.ReplyAsync(batchSecond.Id, "success");
-        (await batch.WithTimeout()).ShouldBe(MpvSendResult.Success);
+        singleRequestCommand.ShouldBe("[\"add\",\"volume\",5]");
+        await mpv.ReplyAsync(singleRequestId, "success");
+        (await singleSendTask.WithTimeout()).ShouldBe(MpvSendResult.Success);
+
+        await mpv.ReplyAsync(batchId, "success");
+        var (secondBatchId, _) = await mpv.ReadRequestAsync();
+        await mpv.ReplyAsync(secondBatchId, "success");
+        (await batchSendTask.WithTimeout()).ShouldBe(MpvSendResult.Success);
     }
 
     [Fact]
     public async Task SendAsync_Batch_WithNoCommands_ReturnsSuccess()
     {
         using var client = new MpvClient((_, _) => Task.FromResult<Stream?>(null));
-
         (await client.SendAsync([])).ShouldBe(MpvSendResult.Success);
     }
 

@@ -32,10 +32,7 @@ customElements.define("mpv-osd-select", class extends HTMLElement {
     }
 });
 
-function openUrl(url)
-{
-const { streamDeckClient } = SDPIComponents;
-streamDeckClient.send('openUrl', {
-    url: url
-});
+function openUrl(url) {
+    const { streamDeckClient } = SDPIComponents;
+    streamDeckClient.send("openUrl", { url: url });
 }

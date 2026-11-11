@@ -1,4 +1,4 @@
-﻿using Shouldly;
+using Shouldly;
 
 namespace MpvStreamDeckController.Tests;
 
@@ -12,7 +12,7 @@ public class MpvCommandParserTests
     public void TryParse_NullOrWhitespace_ReturnsFalse(string? text)
     {
         var isSuccessful = MpvCommandParser.TryParse(text, out var command, out var error);
-        
+
         isSuccessful.ShouldBeFalse();
         command.ShouldBeNull();
         error.ShouldNotBeNull();

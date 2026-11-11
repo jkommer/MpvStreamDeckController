@@ -1,6 +1,6 @@
-﻿using MpvStreamDeckController.Actions.Settings;
-using Shouldly;
 using System.Text.Json;
+using MpvStreamDeckController.Actions.Settings;
+using Shouldly;
 
 namespace MpvStreamDeckController.Tests;
 
@@ -62,7 +62,7 @@ public class MpvProtocolTests
         {
             MpvProtocol
                 .BuildObserveProperty(property.Id, property.Name)
-                .ShouldBe($"{{\"command\":[\"observe_property\",{ property.Id },\"{ property.Name }\"]}}\n");
+                .ShouldBe($"{{\"command\":[\"observe_property\",{property.Id},\"{property.Name}\"]}}\n");
         }
     }
 
@@ -73,7 +73,7 @@ public class MpvProtocolTests
         {
             MpvProtocol
                 .BuildUnobserveProperty(property.Id)
-                .ShouldBe($"{{\"command\":[\"unobserve_property\",{ property.Id }]}}\n");
+                .ShouldBe($"{{\"command\":[\"unobserve_property\",{property.Id}]}}\n");
         }
     }
 

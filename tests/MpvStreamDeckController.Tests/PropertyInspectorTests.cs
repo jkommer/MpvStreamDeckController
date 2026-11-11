@@ -9,7 +9,7 @@ namespace MpvStreamDeckController.Tests;
 /// </summary>
 public class PropertyInspectorTests
 {
-    private static readonly string PropertyInspectorFolder = Path.Combine(AppContext.BaseDirectory, "PropertyInspectors");
+    private static readonly string _propertyInspectorFolder = Path.Combine(AppContext.BaseDirectory, "PropertyInspectors");
 
     [Fact]
     public void ScriptsJs_OsdOptions_MatchMpvOsdMode()
@@ -23,13 +23,13 @@ public class PropertyInspectorTests
         values.ShouldBe(["", .. MpvOsdMode.All.Select(m => m.Prefix)]);
     }
 
-    public static TheoryData<string> PropertyInspectors => [.. Directory.GetFiles(PropertyInspectorFolder, "*.html").Select(file => Path.GetFileName(file))];
+    public static TheoryData<string> PropertyInspectors => [.. Directory.GetFiles(_propertyInspectorFolder, "*.html").Select(file => Path.GetFileName(file))];
 
     [Theory]
     [MemberData(nameof(PropertyInspectors))]
     public void PropertyInspectors_UsingSharedControls_LoadsScriptsJsAfterSdpiComponents(string propertyInspector)
     {
-        var html = File.ReadAllText(Path.Combine(PropertyInspectorFolder, propertyInspector));
+        var html = File.ReadAllText(Path.Combine(_propertyInspectorFolder, propertyInspector));
 
         if (!html.Contains("<mpv-"))
         {
@@ -48,7 +48,7 @@ public class PropertyInspectorTests
     /// </summary>
     private static string ReadMarkedJson(string file, string name)
     {
-        var text = File.ReadAllText(Path.Combine(PropertyInspectorFolder, file));
+        var text = File.ReadAllText(Path.Combine(_propertyInspectorFolder, file));
         var startMarker = $"/** {name} **/";
         var endMarker = $"/** /{name} **/";
 

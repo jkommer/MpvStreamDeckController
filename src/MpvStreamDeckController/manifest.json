@@ -1,221 +1,221 @@
 {
-    "Actions": [
+  "Actions": [
+    {
+      "Icon": "Images/key/01_next_audio_track",
+      "Name": "Cycle Audio",
+      "States": [
         {
-            "Icon": "Images/key/01_next_audio_track",
-            "Name": "Cycle Audio",
-            "States": [
-                {
-                    "Image": "Images/key/01_next_audio_track",
-                    "TitleAlignment": "middle",
-                    "FontSize": 12
-                }
-            ],
-            "SupportedInMultiActions": true,
-            "Tooltip": "Cycle Audio",
-            "PropertyInspectorPath": "PropertyInspectors/Default.html",
-            "UUID": "com.jkommer.mpv.cycleaudio"
-        },
-        {
-            "Icon": "Images/key/02_next_subtitle",
-            "Name": "Cycle Subtitles",
-            "States": [
-                {
-                    "Image": "Images/key/02_next_subtitle",
-                    "TitleAlignment": "middle",
-                    "FontSize": 12
-                }
-            ],
-            "SupportedInMultiActions": true,
-            "Tooltip": "Cycle Subtitles",
-            "PropertyInspectorPath": "PropertyInspectors/Default.html",
-            "UUID": "com.jkommer.mpv.cyclesubtitle"
-        },
-        {
-            "Icon": "Images/key/03_next_chapter",
-            "Name": "Next Chapter",
-            "States": [
-                {
-                    "Image": "Images/key/03_next_chapter",
-                    "TitleAlignment": "middle",
-                    "FontSize": 12
-                }
-            ],
-            "SupportedInMultiActions": true,
-            "Tooltip": "Next Chapter",
-            "PropertyInspectorPath": "PropertyInspectors/Default.html",
-            "UUID": "com.jkommer.mpv.nextchapter"
-        },
-        {
-            "Icon": "Images/key/04_prev_chapter",
-            "Name": "Previous Chapter",
-            "States": [
-                {
-                    "Image": "Images/key/04_prev_chapter",
-                    "TitleAlignment": "middle",
-                    "FontSize": 12
-                }
-            ],
-            "SupportedInMultiActions": true,
-            "Tooltip": "Previous Chapter",
-            "PropertyInspectorPath": "PropertyInspectors/Default.html",
-            "UUID": "com.jkommer.mpv.previouschapter"
-        },
-        {
-            "Icon": "Images/key/05_next_playlist_entry",
-            "Name": "Next Playlist Entry",
-            "States": [
-                {
-                    "Image": "Images/key/05_next_playlist_entry",
-                    "TitleAlignment": "middle",
-                    "FontSize": 12
-                }
-            ],
-            "SupportedInMultiActions": true,
-            "Tooltip": "Next Playlist Entry",
-            "PropertyInspectorPath": "PropertyInspectors/Default.html",
-            "UUID": "com.jkommer.mpv.nextplaylistentry"
-        },
-        {
-            "Icon": "Images/key/06_prev_playlist_entry",
-            "Name": "Previous Playlist Entry",
-            "States": [
-                {
-                    "Image": "Images/key/06_prev_playlist_entry",
-                    "TitleAlignment": "middle",
-                    "FontSize": 12
-                }
-            ],
-            "SupportedInMultiActions": true,
-            "Tooltip": "Previous Playlist Entry",
-            "PropertyInspectorPath": "PropertyInspectors/Default.html",
-            "UUID": "com.jkommer.mpv.previousplaylistentry"
-        },
-        {
-            "Icon": "Images/key/07_play_pause",
-            "Name": "Play/Pause",
-            "States": [
-                {
-                    "Image": "Images/key/07_play_pause",
-                    "TitleAlignment": "middle",
-                    "FontSize": 12
-                }
-            ],
-            "SupportedInMultiActions": true,
-            "Tooltip": "Play / Pause",
-            "PropertyInspectorPath": "PropertyInspectors/Default.html",
-            "UUID": "com.jkommer.mpv.playpause"
-        },
-        {
-            "Icon": "Images/key/08a_acompressor_on",
-            "Name": "Toggle Acompressor",
-            "States": [
-                {
-                    "Image": "Images/key/08b_acompressor_off",
-                    "TitleAlignment": "middle",
-                    "FontSize": 12
-                },
-                {
-                    "Image": "Images/key/08a_acompressor_on",
-                    "TitleAlignment": "middle",
-                    "FontSize": 12
-                }
-            ],
-            "DisableAutomaticStates": true,
-            "SupportedInMultiActions": true,
-            "Tooltip": "Toggle Acompressor",
-            "PropertyInspectorPath": "PropertyInspectors/ACompressor.html",
-            "UUID": "com.jkommer.mpv.toggleacompressor"
-        },
-        {
-            "Icon": "Images/dial/09_seek_dial",
-            "Name": "Seek",
-            "Tooltip": "Rotate to seek in the currently playing media file, press to pause / play",
-            "Controllers": [
-                "Encoder"
-            ],
-            "Encoder": {
-                "layout": "$B1",
-                "TriggerDescription": {
-                    "Push": "Play / Pause",
-                    "Rotate": "Seek",
-                    "Touch": "Play / Pause"
-                }
-            },
-            "States": [
-                {
-                    "Image": "Images/dial/09_seek_dial"
-                }
-            ],
-            "PropertyInspectorPath": "PropertyInspectors/Seek.html",
-            "UUID": "com.jkommer.mpv.seek"
-        },
-        {
-            "Name": "Custom Command",
-            "UUID": "com.jkommer.mpv.customcommand",
-            "Icon": "Images/key/10_custom_command",
-            "Controllers": [
-                "Keypad"
-            ],
-            "States": [
-                {
-                    "Image": "Images/key/10_custom_command",
-                    "TitleAlignment": "middle"
-                }
-            ],
-            "SupportedInMultiActions": true,
-            "Tooltip": "Send any mpv command",
-            "PropertyInspectorPath": "PropertyInspectors/CustomCommand.html"
-        },
-        {
-            "Icon": "Images/dial/11a_volume_dial",
-            "Name": "Volume",
-            "Tooltip": "Rotate to change mpv's volume, press to mute",
-            "Controllers": [
-                "Encoder"
-            ],
-            "Encoder": {
-                "layout": "$B1",
-                "TriggerDescription": {
-                    "Push": "Mute / Unmute",
-                    "Rotate": "Volume",
-                    "Touch": "Mute / Unmute"
-                }
-            },
-            "States": [
-                {
-                    "Image": "Images/dial/11a_volume_dial"
-                },
-                {
-                    "Image": "Images/dial/11b_volume_muted_dial"
-                }
-            ],
-            "PropertyInspectorPath": "PropertyInspectors/Volume.html",
-            "UUID": "com.jkommer.mpv.volume"
+          "Image": "Images/key/01_next_audio_track",
+          "TitleAlignment": "middle",
+          "FontSize": 12
         }
-    ],
-    "$schema": "https://schemas.elgato.com/streamdeck/plugins/manifest.json",
-    "UUID": "com.jkommer.mpv",
-    "Author": "jkommer",
-    "Description": "A stream deck plugin to control mpv",
-    "Name": "mpv",
-    "Icon": "Images/plugin/png/mpv",
-    "Version": "0.0.1.0",
-    "CodePath": "com.jkommer.mpv.exe",
-    "Category": "mpv",
-    "CategoryIcon": "Images/plugin/svg/mpv-category",
-    "OS": [
-        {
-            "Platform": "windows",
-            "MinimumVersion": "10"
-        }
-    ],
-    "SDKVersion": 2,
-    "Software": {
-        "MinimumVersion": "6.4"
+      ],
+      "SupportedInMultiActions": true,
+      "Tooltip": "Cycle Audio",
+      "PropertyInspectorPath": "PropertyInspectors/Default.html",
+      "UUID": "com.jkommer.mpv.cycleaudio"
     },
-    "ApplicationsToMonitor": {
-        "windows": [
-            "mpv.exe"
-        ]
+    {
+      "Icon": "Images/key/02_next_subtitle",
+      "Name": "Cycle Subtitles",
+      "States": [
+        {
+          "Image": "Images/key/02_next_subtitle",
+          "TitleAlignment": "middle",
+          "FontSize": 12
+        }
+      ],
+      "SupportedInMultiActions": true,
+      "Tooltip": "Cycle Subtitles",
+      "PropertyInspectorPath": "PropertyInspectors/Default.html",
+      "UUID": "com.jkommer.mpv.cyclesubtitle"
+    },
+    {
+      "Icon": "Images/key/03_next_chapter",
+      "Name": "Next Chapter",
+      "States": [
+        {
+          "Image": "Images/key/03_next_chapter",
+          "TitleAlignment": "middle",
+          "FontSize": 12
+        }
+      ],
+      "SupportedInMultiActions": true,
+      "Tooltip": "Next Chapter",
+      "PropertyInspectorPath": "PropertyInspectors/Default.html",
+      "UUID": "com.jkommer.mpv.nextchapter"
+    },
+    {
+      "Icon": "Images/key/04_prev_chapter",
+      "Name": "Previous Chapter",
+      "States": [
+        {
+          "Image": "Images/key/04_prev_chapter",
+          "TitleAlignment": "middle",
+          "FontSize": 12
+        }
+      ],
+      "SupportedInMultiActions": true,
+      "Tooltip": "Previous Chapter",
+      "PropertyInspectorPath": "PropertyInspectors/Default.html",
+      "UUID": "com.jkommer.mpv.previouschapter"
+    },
+    {
+      "Icon": "Images/key/05_next_playlist_entry",
+      "Name": "Next Playlist Entry",
+      "States": [
+        {
+          "Image": "Images/key/05_next_playlist_entry",
+          "TitleAlignment": "middle",
+          "FontSize": 12
+        }
+      ],
+      "SupportedInMultiActions": true,
+      "Tooltip": "Next Playlist Entry",
+      "PropertyInspectorPath": "PropertyInspectors/Default.html",
+      "UUID": "com.jkommer.mpv.nextplaylistentry"
+    },
+    {
+      "Icon": "Images/key/06_prev_playlist_entry",
+      "Name": "Previous Playlist Entry",
+      "States": [
+        {
+          "Image": "Images/key/06_prev_playlist_entry",
+          "TitleAlignment": "middle",
+          "FontSize": 12
+        }
+      ],
+      "SupportedInMultiActions": true,
+      "Tooltip": "Previous Playlist Entry",
+      "PropertyInspectorPath": "PropertyInspectors/Default.html",
+      "UUID": "com.jkommer.mpv.previousplaylistentry"
+    },
+    {
+      "Icon": "Images/key/07_play_pause",
+      "Name": "Play/Pause",
+      "States": [
+        {
+          "Image": "Images/key/07_play_pause",
+          "TitleAlignment": "middle",
+          "FontSize": 12
+        }
+      ],
+      "SupportedInMultiActions": true,
+      "Tooltip": "Play / Pause",
+      "PropertyInspectorPath": "PropertyInspectors/Default.html",
+      "UUID": "com.jkommer.mpv.playpause"
+    },
+    {
+      "Icon": "Images/key/08a_acompressor_on",
+      "Name": "Toggle Acompressor",
+      "States": [
+        {
+          "Image": "Images/key/08b_acompressor_off",
+          "TitleAlignment": "middle",
+          "FontSize": 12
+        },
+        {
+          "Image": "Images/key/08a_acompressor_on",
+          "TitleAlignment": "middle",
+          "FontSize": 12
+        }
+      ],
+      "DisableAutomaticStates": true,
+      "SupportedInMultiActions": true,
+      "Tooltip": "Toggle Acompressor",
+      "PropertyInspectorPath": "PropertyInspectors/ACompressor.html",
+      "UUID": "com.jkommer.mpv.toggleacompressor"
+    },
+    {
+      "Icon": "Images/dial/09_seek_dial",
+      "Name": "Seek",
+      "Tooltip": "Rotate to seek in the currently playing media file, press to pause / play",
+      "Controllers": [
+        "Encoder"
+      ],
+      "Encoder": {
+        "layout": "$B1",
+        "TriggerDescription": {
+          "Push": "Play / Pause",
+          "Rotate": "Seek",
+          "Touch": "Play / Pause"
+        }
+      },
+      "States": [
+        {
+          "Image": "Images/dial/09_seek_dial"
+        }
+      ],
+      "PropertyInspectorPath": "PropertyInspectors/Seek.html",
+      "UUID": "com.jkommer.mpv.seek"
+    },
+    {
+      "Name": "Custom Command",
+      "UUID": "com.jkommer.mpv.customcommand",
+      "Icon": "Images/key/10_custom_command",
+      "Controllers": [
+        "Keypad"
+      ],
+      "States": [
+        {
+          "Image": "Images/key/10_custom_command",
+          "TitleAlignment": "middle"
+        }
+      ],
+      "SupportedInMultiActions": true,
+      "Tooltip": "Send any mpv command",
+      "PropertyInspectorPath": "PropertyInspectors/CustomCommand.html"
+    },
+    {
+      "Icon": "Images/dial/11a_volume_dial",
+      "Name": "Volume",
+      "Tooltip": "Rotate to change mpv's volume, press to mute",
+      "Controllers": [
+        "Encoder"
+      ],
+      "Encoder": {
+        "layout": "$B1",
+        "TriggerDescription": {
+          "Push": "Mute / Unmute",
+          "Rotate": "Volume",
+          "Touch": "Mute / Unmute"
+        }
+      },
+      "States": [
+        {
+          "Image": "Images/dial/11a_volume_dial"
+        },
+        {
+          "Image": "Images/dial/11b_volume_muted_dial"
+        }
+      ],
+      "PropertyInspectorPath": "PropertyInspectors/Volume.html",
+      "UUID": "com.jkommer.mpv.volume"
     }
+  ],
+  "$schema": "https://schemas.elgato.com/streamdeck/plugins/manifest.json",
+  "UUID": "com.jkommer.mpv",
+  "Author": "jkommer",
+  "Description": "A stream deck plugin to control mpv",
+  "Name": "mpv",
+  "Icon": "Images/plugin/png/mpv",
+  "Version": "0.0.1.0",
+  "CodePath": "com.jkommer.mpv.exe",
+  "Category": "mpv",
+  "CategoryIcon": "Images/plugin/svg/mpv-category",
+  "OS": [
+    {
+      "Platform": "windows",
+      "MinimumVersion": "10"
+    }
+  ],
+  "SDKVersion": 2,
+  "Software": {
+    "MinimumVersion": "6.4"
+  },
+  "ApplicationsToMonitor": {
+    "windows": [
+      "mpv.exe"
+    ]
+  }
 }

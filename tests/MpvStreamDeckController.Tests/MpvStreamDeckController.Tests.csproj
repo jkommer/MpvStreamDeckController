@@ -1,11 +1,12 @@
-﻿<Project Sdk="Microsoft.NET.Sdk">
+<Project Sdk="Microsoft.NET.Sdk">
 
   <PropertyGroup>
     <ImplicitUsings>enable</ImplicitUsings>
     <Nullable>enable</Nullable>
     <OutputType>Exe</OutputType>
     <TargetFramework>net10.0</TargetFramework>
-    <TestingPlatformDotnetTestSupport>true</TestingPlatformDotnetTestSupport>
+    <!-- The plugin is Windows only (see manifest.json); a fixed RID keeps the other platforms' native libraries out of the package. -->
+    <RuntimeIdentifier>win-x64</RuntimeIdentifier>    
   </PropertyGroup>
 
   <ItemGroup>

@@ -1,18 +1,16 @@
-using BarRaider.SdTools;
 using System.Text.Json;
+using BarRaider.SdTools;
 
 namespace MpvStreamDeckController;
 
 /// <summary>
 /// Helper to track the state of mpv and any observed properties.
 /// 
-/// Keeps track of property values producing a new immuntable <see cref="MpvState"/> when changes have occurred and raises <see cref="StateChanged"/>.
+/// Keeps track of property values producing a new immutable <see cref="MpvState"/> when changes have occurred and raises <see cref="StateChanged"/>.
 /// </summary>
 /// <param name="observedPropertiesChanged">Called whenever the set of observed properties may have changed. Used to communicate the (un-)observed properties to mpv</param>
 public sealed class MpvStateTracker(Action observedPropertiesChanged)
 {
-    private readonly Action _observedPropertiesChanged = observedPropertiesChanged;
-
     private readonly Lock _stateLock = new();
 
     /// <summary>
@@ -60,7 +58,7 @@ public sealed class MpvStateTracker(Action observedPropertiesChanged)
             }
         }
 
-        _observedPropertiesChanged();
+        observedPropertiesChanged();
         return new PropertyHandle(() => UpdateReferenceCounts(properties));
     }
 
@@ -109,7 +107,7 @@ public sealed class MpvStateTracker(Action observedPropertiesChanged)
             RaiseStateChange(snapshot);
         }
 
-        _observedPropertiesChanged();
+        observedPropertiesChanged();
     }
 
     /// <summary>
@@ -162,16 +160,12 @@ public sealed class MpvStateTracker(Action observedPropertiesChanged)
             return;
         }
 
-        object? value = rawValue;
-
-        if (rawValue is double doubleValue && property.Quantize is { } quantize)
+        var value = rawValue switch
         {
-            value = quantize(doubleValue);
-        }
-        else if (rawValue is JsonElement json)
-        {
-            value = property.FromJson?.Invoke(json);
-        }
+            double doubleValue when property.Quantize is { } quantize => quantize(doubleValue),
+            JsonElement json => property.FromJson?.Invoke(json),
+            _ => rawValue
+        };
 
         MpvState snapshot;
 
