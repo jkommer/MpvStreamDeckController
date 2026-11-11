@@ -1,3 +1,4 @@
+using System.Globalization;
 using BarRaider.SdTools;
 using MpvStreamDeckController.Actions.Settings;
 using Newtonsoft.Json.Linq;
@@ -30,6 +31,11 @@ public class VolumeAction : MpvDialAction
         _volumeSettings = VolumeSettings.Read(settings);
     }
 
+    /// <summary>
+    /// Whole volumes as e.g. 42%, fractional ones with one decimal, e.g. 42.5%.
+    /// </summary>
+    internal static string FormatVolume(double volume) => string.Create(CultureInfo.InvariantCulture, $"{volume:0.#}%");
+
     protected override DialFeedback GetFeedback(MpvState state)
     {
         if (!state.IsConnected || state.Number(MpvProperties.Volume) is not { } volume)
@@ -40,7 +46,7 @@ public class VolumeAction : MpvDialAction
         var max = state.Number(MpvProperties.VolumeMax) is { } m and > 0 ? m : DefaultVolumeMax;
         var muted = state.Flag(MpvProperties.Mute) == true;
 
-        return new(muted ? "Muted" : $"{volume:0}%",
+        return new(muted ? "Muted" : FormatVolume(volume),
                    Math.Clamp(volume / max * 100.0, 0, 100),
                    muted ? MutedIcon : VolumeIcon);
     }

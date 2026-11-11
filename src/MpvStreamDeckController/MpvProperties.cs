@@ -18,13 +18,18 @@ public static class MpvProperties
 
     public static readonly MpvProperty TimePos = Create("time-pos", Math.Floor);
     public static readonly MpvProperty Duration = Create("duration", Math.Floor);
-    public static readonly MpvProperty Volume = Create("volume", Math.Round);
-    public static readonly MpvProperty VolumeMax = Create("volume-max", Math.Round);
+    public static readonly MpvProperty Volume = Create("volume", RoundToTenth);
+    public static readonly MpvProperty VolumeMax = Create("volume-max", RoundToTenth);
     public static readonly MpvProperty Mute = Create("mute");
     public static readonly MpvProperty Pause = Create("pause");
     public static readonly MpvProperty ACompressor = Create("af", fromJson: FilterEnabled("acompressor"));
 
     public static IReadOnlyDictionary<long, MpvProperty> All => CreatedProperties;
+
+    /// <summary>
+    /// One decimal, so a dial stepping by e.g. 0.5 shows every step. Halves round up rather than to the nearest even digit, which is Math.Round's default.
+    /// </summary>
+    private static double RoundToTenth(double value) => Math.Round(value, 1, MidpointRounding.AwayFromZero);
 
     private static MpvProperty Create(string name, Func<double, double>? quantize = null, Func<JsonElement, object?>? fromJson = null)
     {

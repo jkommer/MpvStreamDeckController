@@ -21,6 +21,24 @@ public class MpvPropertiesTests
     }
 
     [Theory]
+    [InlineData(42, 42)]
+    [InlineData(42.5, 42.5)]
+    [InlineData(42.44, 42.4)]
+    [InlineData(42.25, 42.3)] // halves round up, not to the nearest even digit
+    [InlineData(42.75, 42.8)]
+    [InlineData(0, 0)]
+    public void Volume_Quantize_KeepsOneDecimal(double value, double expected)
+    {
+        MpvProperties.Volume.Quantize
+            .ShouldNotBeNull()(value)
+            .ShouldBe(expected);
+
+        MpvProperties.VolumeMax.Quantize
+            .ShouldNotBeNull()(value)
+            .ShouldBe(expected);
+    }
+
+    [Theory]
     [InlineData("""{}""")]
     [InlineData("""null""")]
     [InlineData("\"acompressor\"")]
