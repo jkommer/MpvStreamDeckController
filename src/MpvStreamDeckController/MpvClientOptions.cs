@@ -28,5 +28,11 @@ namespace MpvStreamDeckController
         /// How long to wait for mpv's reply to a command before treating the outcome as no reply.
         /// </summary>
         public TimeSpan ReplyTimeout { get; init; } = TimeSpan.FromSeconds(2);
+
+        /// <summary>
+        /// How long a single write to mpv's pipe may take. A write that takes longer means mpv has stopped reading, so
+        /// the connection is closed.
+        /// </summary>
+        public TimeSpan WriteTimeout { get; init; } = TimeSpan.FromSeconds(2);
     }
 }

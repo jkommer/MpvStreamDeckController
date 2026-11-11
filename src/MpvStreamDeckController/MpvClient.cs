@@ -287,7 +287,7 @@ namespace MpvStreamDeckController
 
                 try
                 {
-                    await pipe.WriteAsync(Encoding.UTF8.GetBytes(json));
+                    await WriteAsync(pipe, json);
                 }
                 catch (Exception ex)
                 {
@@ -326,6 +326,28 @@ namespace MpvStreamDeckController
             finally
             {
                 _pendingReplies.TryRemove(requestId, out _);
+            }
+        }
+
+        /// <summary>
+        /// Writes one message to mpv, giving up after <see cref="MpvClientOptions.WriteTimeout"/>. Call with <see cref="_writeLock"/> held.
+        /// A write only stalls when mpv has stopped reading the pipe (e.g. it is frozen); without a limit it would hold the write lock
+        /// and every later send would queue up behind it forever.
+        /// </summary>
+        private async Task WriteAsync(Stream pipe, string json)
+        {
+            using var timeout = new CancellationTokenSource(_options.WriteTimeout);
+
+            try
+            {
+                await pipe.WriteAsync(Encoding.UTF8.GetBytes(json), timeout.Token);
+            }
+            catch (OperationCanceledException) when (timeout.IsCancellationRequested)
+            {
+                // Part of the message may have been written, so the connection can't be used any more. Closing it ends the
+                // read loop, which reports the disconnect; the next send or launch event then reconnects.
+                pipe.Dispose();
+                throw new TimeoutException($"mpv did not accept the write within {_options.WriteTimeout.TotalMilliseconds:0} ms; connection closed.");
             }
         }
 
@@ -414,14 +436,14 @@ namespace MpvStreamDeckController
                         // No longer observed, or dropped and re-added since it was registered. In the latter case its
                         // value was discarded, and mpv won't resend it until it changes; registering again makes mpv
                         // send the current value straight away.
-                        await pipe.WriteAsync(Encoding.UTF8.GetBytes(MpvProtocol.BuildUnobserveProperty(property.Id)));
+                        await WriteAsync(pipe, MpvProtocol.BuildUnobserveProperty(property.Id));
                         _registeredObservedProperties.Remove(property.Id);
                         isRegistered = false;
                     }
 
                     if (generation is { } current && !isRegistered)
                     {
-                        await pipe.WriteAsync(Encoding.UTF8.GetBytes(MpvProtocol.BuildObserveProperty(property.Id, property.Name)));
+                        await WriteAsync(pipe, MpvProtocol.BuildObserveProperty(property.Id, property.Name));
                         _registeredObservedProperties[property.Id] = current;
                     }
                 }

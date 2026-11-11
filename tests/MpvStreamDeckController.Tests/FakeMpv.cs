@@ -33,8 +33,8 @@ internal sealed class FakeMpv : IAsyncDisposable
     }
 
     /// <summary>
-    /// Makes the client's next writes wait until <see cref="ReleaseWrites"/>. A held write keeps the client's write
-    /// lock, so anything else that needs to write queues up behind it.
+    /// Makes the client's next writes wait until <see cref="ReleaseWrites"/>, or until the client gives up on them. A held
+    /// write keeps the client's write lock, so anything else that needs to write queues up behind it.
     /// </summary>
     public void HoldWrites()
     {
@@ -191,7 +191,7 @@ internal sealed class FakeMpv : IAsyncDisposable
         }
     }
 
-    private async Task BeforeWriteAsync()
+    private async Task BeforeWriteAsync(CancellationToken token)
     {
         if (_failWrites)
         {
@@ -201,12 +201,12 @@ internal sealed class FakeMpv : IAsyncDisposable
         if (Volatile.Read(ref _writeGate) is { } gate)
         {
             _writeHeld.TrySetResult();
-            await gate.Task;
+            await gate.Task.WaitAsync(token);
         }
     }
 
     /// <summary>Passes everything through to the pipe, but runs <c>beforeWrite</c> (which may delay or throw) before each write.</summary>
-    private sealed class InterceptingStream(Stream inner, Func<Task> beforeWrite) : Stream
+    private sealed class InterceptingStream(Stream inner, Func<CancellationToken, Task> beforeWrite) : Stream
     {
         public override bool CanRead => inner.CanRead;
         public override bool CanSeek => false;
@@ -224,19 +224,19 @@ internal sealed class FakeMpv : IAsyncDisposable
 
         public override void Write(byte[] buffer, int offset, int count)
         {
-            beforeWrite().GetAwaiter().GetResult();
+            beforeWrite(CancellationToken.None).GetAwaiter().GetResult();
             inner.Write(buffer, offset, count);
         }
 
         public override async Task WriteAsync(byte[] buffer, int offset, int count, CancellationToken cancellationToken)
         {
-            await beforeWrite();
+            await beforeWrite(cancellationToken);
             await inner.WriteAsync(buffer, offset, count, cancellationToken);
         }
 
         public override async ValueTask WriteAsync(ReadOnlyMemory<byte> buffer, CancellationToken cancellationToken = default)
         {
-            await beforeWrite();
+            await beforeWrite(cancellationToken);
             await inner.WriteAsync(buffer, cancellationToken);
         }
 

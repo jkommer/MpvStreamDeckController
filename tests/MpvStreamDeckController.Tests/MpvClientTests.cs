@@ -280,6 +280,24 @@ public class MpvClientTests
     }
 
     [Fact]
+    public async Task SendAsync_WhenAWriteStalls_FailsAfterTheWriteTimeoutAndClosesTheConnection()
+    {
+        await using var mpv = await FakeMpv.StartAsync(new MpvClientOptions { WriteTimeout = TimeSpan.FromMilliseconds(100) });
+        mpv.HoldWrites();
+
+        // The second send queues behind the first one's write lock; it must not be left waiting forever.
+        var stalled = mpv.Client.SendAsync(new MpvCommand("cycle", "pause"));
+        await mpv.WaitUntilAWriteIsHeldAsync();
+        var queued = mpv.Client.SendAsync(new MpvCommand("cycle", "mute"));
+
+        (await stalled.WithTimeout()).ShouldBe(MpvSendResult.WriteFailed);
+        (await queued.WithTimeout()).ShouldBe(MpvSendResult.WriteFailed);
+
+        await mpv.WaitForStateAsync(state => !state.IsConnected);
+        await mpv.WaitForClientToCloseAsync();
+    }
+
+    [Fact]
     public async Task SendAsync_WhenMpvDoesNotReply_ReturnsNoReplyAfterTheTimeout()
     {
         await using var mpv = await FakeMpv.StartAsync(new MpvClientOptions { ReplyTimeout = TimeSpan.FromMilliseconds(200) });
@@ -327,7 +345,9 @@ public class MpvClientTests
         await using var mpv = await FakeMpv.StartAsync();
         mpv.FailWrites = true;
 
-        var result = await mpv.Client.SendAsync(new MpvCommand("cycle", "pause")).WithTimeout();
+        var result = await mpv.Client
+            .SendAsync(new MpvCommand("cycle", "pause"))
+            .WithTimeout();
 
         result.ShouldBe(MpvSendResult.WriteFailed);
         result.IsFailure.ShouldBeTrue();
@@ -344,12 +364,17 @@ public class MpvClientTests
             .ToArray();
 
         var requests = new (long Id, string Command)[count];
+
         for (var i = 0; i < count; i++)
         {
             requests[i] = await mpv.ReadRequestAsync();
         }
 
-        requests.Select(r => r.Id).Distinct().Count().ShouldBe(count);
+        requests
+            .Select(r => r.Id)
+            .Distinct()
+            .Count()
+            .ShouldBe(count);
 
         // Reply to each with its own command as the error text, so every result shows which reply it was given.
         new Random(42).Shuffle(requests);
@@ -358,7 +383,9 @@ public class MpvClientTests
             await mpv.ReplyAsync(request.Id, request.Command);
         }
 
-        var results = await Task.WhenAll(sends).WithTimeout();
+        var results = await Task
+            .WhenAll(sends)
+            .WithTimeout();
 
         for (var i = 0; i < count; i++)
         {
