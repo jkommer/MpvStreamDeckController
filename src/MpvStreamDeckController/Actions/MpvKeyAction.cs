@@ -13,6 +13,7 @@ public abstract class MpvKeyAction : KeypadBase
 {
     private readonly MpvStateSubscription<KeyFeedback>? _stateSubscription;
     private volatile CommonActionSettings _settings;
+    private volatile MpvState _state = MpvState.Inactive;
 
     protected MpvKeyAction(ISDConnection connection, InitialPayload payload, IReadOnlyCollection<MpvProperty>? observedProperties = null)
         : base(connection, payload)
@@ -22,13 +23,26 @@ public abstract class MpvKeyAction : KeypadBase
 
         if (observedProperties is { Count: > 0 })
         {
-            _stateSubscription = new MpvStateSubscription<KeyFeedback>(observedProperties, GetFeedback, OnFeedbackChanged);
+            _stateSubscription = new(observedProperties, OnStateChanged, OnFeedbackChanged);
         }
     }
 
     protected abstract MpvCommand[]? Commands { get; }
 
+    /// <summary>
+    /// The latest mpv state, for actions whose commands depend on it. It only holds values for the properties this action
+    /// observes, and stays <see cref="MpvState.Inactive"/> for an action that observes none.
+    /// </summary>
+    protected MpvState State => _state;
+
+    /// <summary>What the key should show for a given mpv state. Only called for actions that observe properties.</summary>
     protected virtual KeyFeedback GetFeedback(MpvState state) => default;
+
+    private KeyFeedback OnStateChanged(MpvState state)
+    {
+        _state = state;
+        return GetFeedback(state);
+    }
 
     public override void KeyPressed(KeyPayload payload) => _ = Connection.SendCommandsAsync(_settings.Apply(Commands));
     public override void KeyReleased(KeyPayload payload) { }

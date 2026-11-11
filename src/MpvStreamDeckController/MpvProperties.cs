@@ -16,6 +16,8 @@ public static class MpvProperties
     private static long _currentId = 1;
     private static readonly Dictionary<long, MpvProperty> _createdProperties = [];
 
+    public static readonly MpvProperty Chapter = Create("chapter");
+    public static readonly MpvProperty Chapters = Create("chapters");
     public static readonly MpvProperty TimePos = Create("time-pos", Math.Floor);
     public static readonly MpvProperty Duration = Create("duration", Math.Floor);
     public static readonly MpvProperty Volume = Create("volume", RoundToTenth);

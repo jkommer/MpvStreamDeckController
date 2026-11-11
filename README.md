@@ -9,7 +9,7 @@ keys and dials act on the running player directly and dials show live state such
 |---|---|---|
 | Play / Pause | Key | Toggles pause |
 | Cycle Audio / Cycle Subtitles | Key | Switches to the next audio or subtitle track |
-| Next / Previous Chapter | Key | Jumps between chapters |
+| Next / Previous Chapter | Key | Jumps between chapters, continuing into the next or previous file at the ends (optional) |
 | Next / Previous Playlist Entry | Key | Moves through the playlist |
 | Toggle Acompressor | Key | Toggles the audio compressor (needs `acompressor.lua`, see below); the key shows whether it's on |
 | Custom Command | Key | Sends any mpv command, written as in `input.conf` |
@@ -41,6 +41,9 @@ The plugin connects automatically when mpv starts and reconnects if mpv is resta
 Most actions have an **OSD** setting that chooses whether mpv shows a message or bar on screen when the action is
 used. By default nothing is shown.
 
+- **Next / Previous Chapter**: *Playlist* (on by default) makes the key continue into the next file after the last
+  chapter, and into the previous file before the first; files without chapters always move through the playlist.
+  Untick it to only move between chapters.
 - **Seek**: the seconds per dial tick and the seek type (exact, keyframes, or mpv's default).
 - **Volume**: the percentage per dial tick.
 - **Custom Command**: the command, e.g. `cycle pause`, `seek 30` or `add volume -5; show-text "${volume}"`. Several

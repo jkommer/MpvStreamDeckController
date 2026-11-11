@@ -12,7 +12,6 @@
       ],
       "SupportedInMultiActions": true,
       "Tooltip": "Cycle Audio",
-      "PropertyInspectorPath": "PropertyInspectors/Default.html",
       "UUID": "com.jkommer.mpv.cycleaudio"
     },
     {
@@ -27,7 +26,6 @@
       ],
       "SupportedInMultiActions": true,
       "Tooltip": "Cycle Subtitles",
-      "PropertyInspectorPath": "PropertyInspectors/Default.html",
       "UUID": "com.jkommer.mpv.cyclesubtitle"
     },
     {
@@ -42,7 +40,7 @@
       ],
       "SupportedInMultiActions": true,
       "Tooltip": "Next Chapter",
-      "PropertyInspectorPath": "PropertyInspectors/Default.html",
+      "PropertyInspectorPath": "PropertyInspectors/Chapter.html",
       "UUID": "com.jkommer.mpv.nextchapter"
     },
     {
@@ -57,7 +55,7 @@
       ],
       "SupportedInMultiActions": true,
       "Tooltip": "Previous Chapter",
-      "PropertyInspectorPath": "PropertyInspectors/Default.html",
+      "PropertyInspectorPath": "PropertyInspectors/Chapter.html",
       "UUID": "com.jkommer.mpv.previouschapter"
     },
     {
@@ -72,7 +70,6 @@
       ],
       "SupportedInMultiActions": true,
       "Tooltip": "Next Playlist Entry",
-      "PropertyInspectorPath": "PropertyInspectors/Default.html",
       "UUID": "com.jkommer.mpv.nextplaylistentry"
     },
     {
@@ -87,7 +84,6 @@
       ],
       "SupportedInMultiActions": true,
       "Tooltip": "Previous Playlist Entry",
-      "PropertyInspectorPath": "PropertyInspectors/Default.html",
       "UUID": "com.jkommer.mpv.previousplaylistentry"
     },
     {
@@ -102,7 +98,6 @@
       ],
       "SupportedInMultiActions": true,
       "Tooltip": "Play / Pause",
-      "PropertyInspectorPath": "PropertyInspectors/Default.html",
       "UUID": "com.jkommer.mpv.playpause"
     },
     {
@@ -203,6 +198,7 @@
   "CodePath": "com.jkommer.mpv.exe",
   "Category": "mpv",
   "CategoryIcon": "Images/plugin/svg/mpv-category",
+  "PropertyInspectorPath": "PropertyInspectors/Default.html",
   "OS": [
     {
       "Platform": "windows",

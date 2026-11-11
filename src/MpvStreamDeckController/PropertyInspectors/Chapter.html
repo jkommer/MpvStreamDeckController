@@ -1,0 +1,20 @@
+<!DOCTYPE html>
+<html>
+<head lang="en">
+    <meta charset="utf-8" />
+    <script src="sdpi-components.js"></script>
+    <script src="scripts.js"></script>
+    <link rel="stylesheet" href="styles.css" />
+</head>
+<body>
+    <sdpi-item label="Playlist">
+        <sdpi-checkbox setting="enablePlaylistNavigation" default="true" label="Continue into the next / previous file"></sdpi-checkbox>
+    </sdpi-item>
+    <mpv-osd-select></mpv-osd-select>
+    <details>
+        <summary>About these settings</summary>
+        <p><b>Playlist</b>: when ticked, Next Chapter on the last chapter moves to the next file in the playlist, and Previous Chapter on the first chapter moves to the previous file. Files without chapters always move through the playlist.</p>
+        <p>When unticked, the key only moves between chapters.</p>
+    </details>
+</body>
+</html>

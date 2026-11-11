@@ -20,6 +20,7 @@ public abstract class MpvDialAction : KeyAndEncoderBase
 
     private readonly MpvStateSubscription<DialFeedback>? _stateSubscription;
     private volatile CommonActionSettings _settings;
+    private volatile MpvState _state = MpvState.Inactive;
 
     protected MpvDialAction(ISDConnection connection, InitialPayload payload, IReadOnlyCollection<MpvProperty> observedProperties)
         : base(connection, payload)
@@ -29,13 +30,27 @@ public abstract class MpvDialAction : KeyAndEncoderBase
 
         if (observedProperties is { Count: > 0 })
         {
-            _stateSubscription = new(observedProperties, GetFeedback, OnFeedbackChanged);
+            _stateSubscription = new(observedProperties, OnStateChanged, OnFeedbackChanged);
         }
     }
 
     protected abstract MpvCommand[] RotateCommands(int ticks);
     protected abstract MpvCommand[] PressCommands { get; }
+
+    /// <summary>
+    /// The latest mpv state, for actions whose commands depend on it. It only holds values for the properties this action
+    /// observes, and stays <see cref="MpvState.Inactive"/> for an action that observes none.
+    /// </summary>
+    protected MpvState State => _state;
+
+    /// <summary>What the dial should show for a given mpv state. Only called for actions that observe properties.</summary>
     protected abstract DialFeedback GetFeedback(MpvState state);
+
+    private DialFeedback OnStateChanged(MpvState state)
+    {
+        _state = state;
+        return GetFeedback(state);
+    }
 
     public override void DialRotate(DialRotatePayload payload) => SendCommands(RotateCommands(payload.Ticks));
     public override void DialDown(DialPayload payload) => SendCommands(PressCommands);
