@@ -229,6 +229,26 @@
       "SupportedInMultiActions": true,
       "Tooltip": "Toggle On Top",
       "UUID": "com.jkommer.mpv.toggleontop"
+    },
+    {
+      "Icon": "Images/key/14a_fullscreen_on",
+      "Name": "Toggle Fullscreen",
+      "States": [
+        {
+          "Image": "Images/key/14b_fullscreen_off",
+          "TitleAlignment": "middle",
+          "FontSize": 12
+        },
+        {
+          "Image": "Images/key/14a_fullscreen_on",
+          "TitleAlignment": "middle",
+          "FontSize": 12
+        }
+      ],
+      "DisableAutomaticStates": true,
+      "SupportedInMultiActions": true,
+      "Tooltip": "Toggle Fullscreen",
+      "UUID": "com.jkommer.mpv.togglefullscreen"
     }
   ],
   "$schema": "https://schemas.elgato.com/streamdeck/plugins/manifest.json",

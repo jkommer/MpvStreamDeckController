@@ -9,7 +9,6 @@ public class ToggleACompressorAction(ISDConnection connection, InitialPayload pa
 
     protected override KeyFeedback GetFeedback(MpvState state) => CreateFeedback(state);
 
-    /// <summary>What the key shows for a given mpv state. Separate from the action so it can be tested without a Stream Deck connection.</summary>
     internal static KeyFeedback CreateFeedback(MpvState state)
     {
         var iconState = state.Flag(MpvProperties.ACompressor) ?? false ? (uint)1 : 0;

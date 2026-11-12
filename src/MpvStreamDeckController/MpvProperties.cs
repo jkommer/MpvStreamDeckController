@@ -26,6 +26,7 @@ public static class MpvProperties
     public static readonly MpvProperty Mute = Create("mute");
     public static readonly MpvProperty Pause = Create("pause");
     public static readonly MpvProperty OnTop = Create("ontop");
+    public static readonly MpvProperty Fullscreen = Create("fullscreen");
     public static readonly MpvProperty ACompressor = Create("af", fromJson: FilterEnabled("acompressor"));
 
     public static IReadOnlyDictionary<long, MpvProperty> All => _createdProperties;
