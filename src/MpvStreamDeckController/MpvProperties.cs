@@ -20,6 +20,7 @@ public static class MpvProperties
     public static readonly MpvProperty Chapters = Create("chapters");
     public static readonly MpvProperty TimePos = Create("time-pos", Math.Floor);
     public static readonly MpvProperty Duration = Create("duration", Math.Floor);
+    public static readonly MpvProperty PlaybackSpeed = Create("speed");
     public static readonly MpvProperty Volume = Create("volume", RoundToTenth);
     public static readonly MpvProperty VolumeMax = Create("volume-max", RoundToTenth);
     public static readonly MpvProperty Mute = Create("mute");

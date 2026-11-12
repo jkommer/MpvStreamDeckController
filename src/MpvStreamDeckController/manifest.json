@@ -186,6 +186,29 @@
       ],
       "PropertyInspectorPath": "PropertyInspectors/Volume.html",
       "UUID": "com.jkommer.mpv.volume"
+    },
+    {
+      "Icon": "Images/dial/12_playback_speed_dial",
+      "Name": "Playback Speed",
+      "Tooltip": "Rotate to change mpv's playback speed, press to reset to 1.00x",
+      "Controllers": [
+        "Encoder"
+      ],
+      "Encoder": {
+        "layout": "$A1",
+        "TriggerDescription": {
+          "Push": "Reset to 1.00x",
+          "Rotate": "Playback Speed",
+          "Touch": "Reset to 1.00x"
+        }
+      },
+      "States": [
+        {
+          "Image": "Images/dial/12_playback_speed_dial"
+        }
+      ],
+      "PropertyInspectorPath": "PropertyInspectors/PlaybackSpeed.html",
+      "UUID": "com.jkommer.mpv.playbackspeed"
     }
   ],
   "$schema": "https://schemas.elgato.com/streamdeck/plugins/manifest.json",
