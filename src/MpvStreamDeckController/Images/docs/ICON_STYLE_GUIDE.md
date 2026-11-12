@@ -64,6 +64,7 @@ A ready-to-use helper script is in `tools/icon_toolkit.py`. It encodes the tile,
 | `10_custom_command` | Run a custom mpv command/script | Terminal window (white outline + title line) with prompt `>` and cursor bar | prompt chevron |
 | `11a_volume` / `11b_volume_muted` (+ `_dial` versions) | Dial volume control / muted state | Bold speaker + two wave arcs; muted = everything `#8a8a94` plus slash `stroke-width 8` | waves |
 | `12_playback_speed_dial` (dial only) | Dial playback speed control | Speedometer: 240° arc (dimmed white track), five white tick marks, white tapered needle on a white hub | filled part of the arc up to the needle, hub ring |
+| `13a_ontop_on` / `13b_ontop_off` | Always on top on / off | Two overlapping windows: back window (white outline, cut where the front one covers it), front window with a title line | front window; off = everything `#8a8a94` plus slash |
 
 Toggle actions: provide an **on** icon (normal palette) and an **off** icon. The off icon is the on icon with identical geometry (do not alter shapes, heights or indicator elements), recoloured entirely to `#8a8a94`, with a diagonal slash from lower-left to upper-right (`M30 112 L114 32`, `stroke-width 8`, round caps) drawn on top. Nothing in the glyph may be rearranged or enlarged so that it collides with other elements. The same slash is used for the muted volume icon.
 

@@ -1,7 +1,7 @@
 # MpvStreamDeckController
 
 A Stream Deck plugin to control [mpv](https://mpv.io) on Windows. It talks to mpv through mpv's JSON IPC interface, so
-keys and dials act on the running player directly and dials show live state such as the playback position and volume.
+keys and dials act on the running player directly and dials show live state such as the playback position, volume and speed.
 
 ## Actions
 
@@ -12,9 +12,11 @@ keys and dials act on the running player directly and dials show live state such
 | Next / Previous Chapter | Key | Jumps between chapters, continuing into the next or previous file at the ends (optional) |
 | Next / Previous Playlist Entry | Key | Moves through the playlist |
 | Toggle Acompressor | Key | Toggles the audio compressor (needs `acompressor.lua`, see below); the key shows whether it's on |
+| Toggle On Top | Key | Toggles whether the mpv window stays on top of other windows; the key shows whether it's on |
 | Custom Command | Key | Sends any mpv command, written as in `input.conf` |
 | Seek | Dial | Rotate to seek, press or tap to play / pause; shows the position |
 | Volume | Dial | Rotate to change the volume, press or tap to mute; shows the volume |
+| Playback Speed | Dial | Rotate to change the playback speed, press or tap to reset to 1.00x; shows the speed |
 
 ## Requirements
 
@@ -46,6 +48,7 @@ used. By default nothing is shown.
   Untick it to only move between chapters.
 - **Seek**: the seconds per dial tick and the seek type (exact, keyframes, or mpv's default).
 - **Volume**: the percentage per dial tick.
+- **Playback Speed**: the speed change per dial tick (0.1 by default).
 - **Custom Command**: the command, e.g. `cycle pause`, `seek 30` or `add volume -5; show-text "${volume}"`. Several
   commands can be separated with `;`. Tick *Expand ${property}* to have mpv fill in property values.
 

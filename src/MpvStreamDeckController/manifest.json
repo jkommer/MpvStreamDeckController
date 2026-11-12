@@ -209,6 +209,26 @@
       ],
       "PropertyInspectorPath": "PropertyInspectors/PlaybackSpeed.html",
       "UUID": "com.jkommer.mpv.playbackspeed"
+    },
+    {
+      "Icon": "Images/key/13a_ontop_on",
+      "Name": "Toggle On Top",
+      "States": [
+        {
+          "Image": "Images/key/13b_ontop_off",
+          "TitleAlignment": "middle",
+          "FontSize": 12
+        },
+        {
+          "Image": "Images/key/13a_ontop_on",
+          "TitleAlignment": "middle",
+          "FontSize": 12
+        }
+      ],
+      "DisableAutomaticStates": true,
+      "SupportedInMultiActions": true,
+      "Tooltip": "Toggle On Top",
+      "UUID": "com.jkommer.mpv.toggleontop"
     }
   ],
   "$schema": "https://schemas.elgato.com/streamdeck/plugins/manifest.json",
