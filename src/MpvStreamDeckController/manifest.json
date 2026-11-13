@@ -516,6 +516,29 @@
       "SupportedInMultiActions": true,
       "Tooltip": "Set the start of an A-B loop, then its end, then clear it",
       "UUID": "com.jkommer.mpv.abloop"
+    },
+    {
+      "Icon": "Images/dial/28_custom_dial",
+      "Name": "Custom Dial",
+      "Tooltip": "Send any mpv commands when the dial is turned or pressed",
+      "Controllers": [
+        "Encoder"
+      ],
+      "Encoder": {
+        "layout": "$X1",
+        "TriggerDescription": {
+          "Push": "Press command",
+          "Rotate": "Clockwise / anticlockwise command",
+          "Touch": "Press command"
+        }
+      },
+      "States": [
+        {
+          "Image": "Images/dial/28_custom_dial"
+        }
+      ],
+      "PropertyInspectorPath": "PropertyInspectors/CustomDial.html",
+      "UUID": "com.jkommer.mpv.customdial"
     }
   ],
   "$schema": "https://schemas.elgato.com/streamdeck/plugins/manifest.json",

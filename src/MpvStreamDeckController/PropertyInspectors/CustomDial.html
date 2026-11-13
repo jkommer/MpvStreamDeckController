@@ -1,0 +1,37 @@
+<!DOCTYPE html>
+<html>
+<head lang="en">
+    <meta charset="utf-8" />
+    <script src="sdpi-components.js"></script>
+    <script src="scripts.js"></script>
+    <link rel="stylesheet" href="styles.css" />
+</head>
+<body>
+    <sdpi-item label="Clockwise">
+        <sdpi-textfield setting="rotateRightCommand" placeholder="add volume 2"></sdpi-textfield>
+    </sdpi-item>
+    <sdpi-item label="Anticlockwise">
+        <sdpi-textfield setting="rotateLeftCommand" placeholder="add volume -2"></sdpi-textfield>
+    </sdpi-item>
+    <sdpi-item label="Press">
+        <sdpi-textfield setting="pressCommand" placeholder="cycle mute"></sdpi-textfield>
+    </sdpi-item>
+    <sdpi-item label="Properties">
+        <sdpi-checkbox setting="expandProperties" label="Expand ${property}"></sdpi-checkbox>
+    </sdpi-item>
+    <mpv-osd-select></mpv-osd-select>
+    <details>
+        <summary>Syntax and examples</summary>
+        <p>Each command uses the same format as an mpv <code>input.conf</code> line; separate several commands with <code>;</code>. The clockwise and anticlockwise commands run once per dial tick. Leave a field empty if that part of the dial should do nothing.</p>
+        <p>The dial itself shows no value. Choose an OSD mode to have mpv show the result on screen, or add a <code>show-text</code> command with "Expand" ticked.</p>
+        <p>
+            Video zoom:<br />
+            <code>add video-zoom 0.1</code> / <code>add video-zoom -0.1</code> / <code>set video-zoom 0</code><br />
+            Subtitle size:<br />
+            <code>add sub-scale 0.1</code> / <code>add sub-scale -0.1</code> / <code>set sub-scale 1</code><br />
+            Brightness, shown on screen:<br />
+            <code>add brightness 1; show-text "Brightness ${brightness}"</code>
+        </p>
+    </details>
+</body>
+</html>

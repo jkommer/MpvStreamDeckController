@@ -28,6 +28,7 @@ keys and dials act on the running player directly and dials show live state such
 | Frame Step | Dial | Rotate to step forwards or backwards one frame per tick, press or tap to play / pause; shows the position, or the frame number while paused |
 | Playback Speed | Dial | Rotate to change the playback speed, press or tap to reset to 1.00x; shows the speed |
 | Subtitle Delay / Audio Delay | Dial | Rotate to make the subtitles or audio come later or earlier, press or tap to reset to 0; shows the delay in milliseconds |
+| Custom Dial | Dial | Sends your own mpv commands: one per tick clockwise, one per tick anticlockwise, and one on press or tap |
 
 ## Requirements
 
@@ -65,6 +66,8 @@ used. By default nothing is shown.
 - **Subtitle Delay / Audio Delay**: the milliseconds per dial tick (100 by default).
 - **Custom Command**: the command, e.g. `cycle pause`, `seek 30` or `add volume -5; show-text "${volume}"`. Several
   commands can be separated with `;`. Tick *Expand ${property}* to have mpv fill in property values.
+- **Custom Dial**: a command each for clockwise, anticlockwise and press, written like a Custom Command; an empty
+  one does nothing. The dial shows no value itself, so pick an OSD mode to see the result in mpv.
 
 For plugin settings use a full stop for decimals (`0.5`, not `0,5`).
 
