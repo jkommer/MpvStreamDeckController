@@ -16,6 +16,8 @@ keys and dials act on the running player directly and dials show live state such
 | Toggle On Top | Key | Toggles whether the mpv window stays on top of other windows; the key shows whether it's on |
 | Toggle Fullscreen | Key | Toggles fullscreen; the key shows whether it's on |
 | Toggle Subtitle Visibility | Key | Shows or hides subtitles without changing the selected track; the key shows whether they're visible |
+| Toggle Mute | Key | Mutes or unmutes; the key shows whether it's muted |
+| Volume Up / Volume Down | Key | Changes the volume by a configurable step |
 | Custom Command | Key | Sends any mpv command, written as in `input.conf` |
 | Seek | Dial | Rotate to seek, press or tap to play / pause; shows the position |
 | Volume | Dial | Rotate to change the volume, press or tap to mute; shows the volume |
@@ -51,6 +53,7 @@ used. By default nothing is shown.
   Untick it to only move between chapters.
 - **Seek**: the seconds per dial tick and the seek type (exact, keyframes, or mpv's default).
 - **Volume**: the percentage per dial tick.
+- **Volume Up / Volume Down**: the percentage per key press (2 by default).
 - **Playback Speed**: the speed change per dial tick (0.1 by default).
 - **Custom Command**: the command, e.g. `cycle pause`, `seek 30` or `add volume -5; show-text "${volume}"`. Several
   commands can be separated with `;`. Tick *Expand ${property}* to have mpv fill in property values.

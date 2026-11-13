@@ -283,6 +283,56 @@
       "SupportedInMultiActions": true,
       "Tooltip": "Shuffle Playlist",
       "UUID": "com.jkommer.mpv.shuffleplaylist"
+    },
+    {
+      "Icon": "Images/key/11a_volume",
+      "Name": "Toggle Mute",
+      "States": [
+        {
+          "Image": "Images/key/11a_volume",
+          "TitleAlignment": "middle",
+          "FontSize": 12
+        },
+        {
+          "Image": "Images/key/11b_volume_muted",
+          "TitleAlignment": "middle",
+          "FontSize": 12
+        }
+      ],
+      "DisableAutomaticStates": true,
+      "SupportedInMultiActions": true,
+      "Tooltip": "Toggle Mute",
+      "UUID": "com.jkommer.mpv.togglemute"
+    },
+    {
+      "Icon": "Images/key/17_volume_up",
+      "Name": "Volume Up",
+      "States": [
+        {
+          "Image": "Images/key/17_volume_up",
+          "TitleAlignment": "middle",
+          "FontSize": 12
+        }
+      ],
+      "SupportedInMultiActions": true,
+      "Tooltip": "Volume Up",
+      "PropertyInspectorPath": "PropertyInspectors/VolumeKey.html",
+      "UUID": "com.jkommer.mpv.volumeup"
+    },
+    {
+      "Icon": "Images/key/18_volume_down",
+      "Name": "Volume Down",
+      "States": [
+        {
+          "Image": "Images/key/18_volume_down",
+          "TitleAlignment": "middle",
+          "FontSize": 12
+        }
+      ],
+      "SupportedInMultiActions": true,
+      "Tooltip": "Volume Down",
+      "PropertyInspectorPath": "PropertyInspectors/VolumeKey.html",
+      "UUID": "com.jkommer.mpv.volumedown"
     }
   ],
   "$schema": "https://schemas.elgato.com/streamdeck/plugins/manifest.json",

@@ -3,9 +3,9 @@ using Newtonsoft.Json.Linq;
 namespace MpvStreamDeckController.Actions.Settings;
 
 /// <summary>
-/// Settings for the Volume dial.
+/// Settings for the Volume dial and the Volume Up / Volume Down keys.
 /// </summary>
-/// <param name="Step">Volume percentage points to change per dial tick.</param>
+/// <param name="Step">Volume percentage points to change per dial tick or key press.</param>
 public sealed record VolumeSettings(double Step = VolumeSettings.DefaultStep)
 {
     public const double DefaultStep = 2;
@@ -23,7 +23,7 @@ public sealed record VolumeSettings(double Step = VolumeSettings.DefaultStep)
     }
 
     /// <summary>
-    /// The command to change the volume by <paramref name="ticks"/> steps, down if negative. mpv clamps the result to
+    /// The command to change the volume by <paramref name="ticks"/> steps, down if negative; a key press is one step. mpv clamps the result to
     /// [0, volume-max], so no range handling is needed here.
     /// </summary>
     public MpvCommand CreateCommand(int ticks) => new("add", "volume", Math.Round(ticks * Step, 3));
