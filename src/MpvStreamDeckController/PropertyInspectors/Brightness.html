@@ -1,0 +1,20 @@
+<!DOCTYPE html>
+<html>
+<head lang="en">
+    <meta charset="utf-8" />
+    <script src="sdpi-components.js"></script>
+    <script src="scripts.js"></script>
+    <link rel="stylesheet" href="styles.css" />
+</head>
+<body>
+    <sdpi-item label="Step">
+        <sdpi-textfield setting="brightnessStep" placeholder="1" pattern="\d*\.?\d+"></sdpi-textfield>
+    </sdpi-item>
+    <mpv-osd-select></mpv-osd-select>
+    <details>
+        <summary>About these settings</summary>
+        <p><b>Step</b> is the amount to change the brightness by per dial tick, e.g. <code>1</code> or <code>2.5</code>. Empty or invalid values use 1.</p>
+        <p>The brightness never goes below -100 or above 100; 0 leaves the picture as it is. Press the dial to reset it to 0.</p>
+    </details>
+</body>
+</html>

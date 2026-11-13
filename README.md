@@ -30,6 +30,7 @@ keys and dials act on the running player directly and dials show live state such
 | Volume | Dial | Rotate to change the volume, press or tap to mute; shows the volume |
 | Frame Step | Dial | Rotate to step forwards or backwards one frame per tick, press or tap to play / pause; shows the position, or the frame number while paused |
 | Playback Speed | Dial | Rotate to change the playback speed, press or tap to reset to 1.00x; shows the speed |
+| Brightness | Dial | Rotate to make the picture brighter or darker, press or tap to reset to 0; shows the brightness, from -100 to 100 |
 | Subtitle Delay / Audio Delay | Dial | Rotate to make the subtitles or audio come later or earlier, press or tap to reset to 0; shows the delay in milliseconds |
 | Custom Dial | Dial | Sends your own mpv commands: one per tick clockwise, one per tick anticlockwise, and one on press or tap |
 
@@ -65,6 +66,7 @@ used. By default nothing is shown.
 - **Volume Up / Volume Down**: the percentage per key press (2 by default).
 - **Seek Back / Seek Forward**: the seconds per key press (5 by default) and the seek type, as for the Seek dial.
 - **Playback Speed**: the speed change per dial tick (0.1 by default).
+- **Brightness**: the brightness change per dial tick (1 by default).
 - **Subtitle Delay / Audio Delay**: the milliseconds per dial tick (100 by default).
 - **Custom Command**: the command, e.g. `cycle pause`, `seek 30` or `add volume -5; show-text "${volume}"`. Several
   commands can be separated with `;`. Tick *Expand ${property}* to have mpv fill in property values.

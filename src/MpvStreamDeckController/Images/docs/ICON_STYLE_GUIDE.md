@@ -81,6 +81,7 @@ A ready-to-use helper script is in `tools/icon_toolkit.py`. It encodes the tile,
 | `29_quit` | Quit mpv | Power symbol: white ring open at the top with a vertical bar through the gap | bar |
 | `30a_deband_on` / `30b_deband_off` | Deband on / off | Descending white staircase (the colour bands) above a smooth S-curve following the same slope (the debanded gradient); both descend so the off-state slash crosses them | curve; off = everything `#8a8a94` plus slash |
 | `31a_interpolation_on` / `31b_interpolation_off` | Frame interpolation on / off | Two solid white frames (the real frames) with a dotted frame outline between them (the generated in-between frame) | dotted frame; off = everything `#8a8a94` plus slash |
+| `32_brightness_dial` (dial only) | Dial brightness control | Sun: solid white disc with eight short rays | rays |
 
 Toggle actions: provide an **on** icon (normal palette) and an **off** icon. The off icon is the on icon with identical geometry (do not alter shapes, heights or indicator elements), recoloured entirely to `#8a8a94`, with a diagonal slash from lower-left to upper-right (`M30 112 L114 32`, `stroke-width 8`, round caps) drawn on top. Nothing in the glyph may be rearranged or enlarged so that it collides with other elements. The same slash is used for the muted volume icon.
 
@@ -110,7 +111,7 @@ Do not use white-on-transparent for anything except the dial icon: it is invisib
 
 **Do not generate PNGs for key, dial or category icons.** Stream Deck supports SVG natively for these, so SVG is the only deliverable. The plugin icon (manifest `Icon`) is the exception because it must be a PNG. Keep `plugin/svg/mpv.svg` as the source and render both PNGs from it (256x256 and 512x512 for `@2x`); verify the pixel dimensions after rendering (the toolkit's `export_plugin_icon` asserts them). PNG previews and the `.ico` are generated separately and are not part of the manifest.
 
-- **Naming:** `NN_verb_object` in snake_case with a two-digit sequence number (`30_...` for the next new icon). Use `a`/`b` suffixes for states (`08a_..._on`, `08b_..._off`). Dial versions end in `_dial`.
+- **Naming:** `NN_verb_object` in snake_case with a two-digit sequence number (`33_...` for the next new icon). Use `a`/`b` suffixes for states (`08a_..._on`, `08b_..._off`). Dial versions end in `_dial`.
 - **Rasterizing** (only for the plugin icon, the `.ico` and preview images): use `cairosvg` (`cairosvg.svg2png(bytestring=..., output_width=N, output_height=N)`), always rendered from the SVG at the target size; never upscale a smaller PNG.
 
 ## 8. Manifest rules

@@ -37,6 +37,7 @@ public static class MpvProperties
     public static readonly MpvProperty SubVisibility = Create("sub-visibility");
     public static readonly MpvProperty Deband = Create("deband");
     public static readonly MpvProperty Interpolation = Create("interpolation");
+    public static readonly MpvProperty Brightness = Create("brightness", RoundToTenth);
     public static readonly MpvProperty SubDelay = Create("sub-delay");
     public static readonly MpvProperty AudioDelay = Create("audio-delay");
     public static readonly MpvProperty LoopFile = Create("loop-file");

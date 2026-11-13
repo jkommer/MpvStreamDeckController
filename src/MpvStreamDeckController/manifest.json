@@ -594,6 +594,29 @@
       "SupportedInMultiActions": true,
       "Tooltip": "Toggle Interpolation",
       "UUID": "com.jkommer.mpv.toggleinterpolation"
+    },
+    {
+      "Icon": "Images/dial/32_brightness_dial",
+      "Name": "Brightness",
+      "Tooltip": "Rotate to change mpv's brightness, press to reset to 0",
+      "Controllers": [
+        "Encoder"
+      ],
+      "Encoder": {
+        "layout": "$B1",
+        "TriggerDescription": {
+          "Push": "Reset to 0",
+          "Rotate": "Brightness",
+          "Touch": "Reset to 0"
+        }
+      },
+      "States": [
+        {
+          "Image": "Images/dial/32_brightness_dial"
+        }
+      ],
+      "PropertyInspectorPath": "PropertyInspectors/Brightness.html",
+      "UUID": "com.jkommer.mpv.brightness"
     }
   ],
   "$schema": "https://schemas.elgato.com/streamdeck/plugins/manifest.json",
