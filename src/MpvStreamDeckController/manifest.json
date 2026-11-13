@@ -249,6 +249,26 @@
       "SupportedInMultiActions": true,
       "Tooltip": "Toggle Fullscreen",
       "UUID": "com.jkommer.mpv.togglefullscreen"
+    },
+    {
+      "Icon": "Images/key/15a_sub_visibility_on",
+      "Name": "Toggle Subtitle Visibility",
+      "States": [
+        {
+          "Image": "Images/key/15b_sub_visibility_off",
+          "TitleAlignment": "middle",
+          "FontSize": 12
+        },
+        {
+          "Image": "Images/key/15a_sub_visibility_on",
+          "TitleAlignment": "middle",
+          "FontSize": 12
+        }
+      ],
+      "DisableAutomaticStates": true,
+      "SupportedInMultiActions": true,
+      "Tooltip": "Toggle Subtitle Visibility",
+      "UUID": "com.jkommer.mpv.togglesubtitlevisibility"
     }
   ],
   "$schema": "https://schemas.elgato.com/streamdeck/plugins/manifest.json",

@@ -14,6 +14,7 @@ keys and dials act on the running player directly and dials show live state such
 | Toggle Acompressor | Key | Toggles the audio compressor (needs `acompressor.lua`, see below); the key shows whether it's on |
 | Toggle On Top | Key | Toggles whether the mpv window stays on top of other windows; the key shows whether it's on |
 | Toggle Fullscreen | Key | Toggles fullscreen; the key shows whether it's on |
+| Toggle Subtitle Visibility | Key | Shows or hides subtitles without changing the selected track; the key shows whether they're visible |
 | Custom Command | Key | Sends any mpv command, written as in `input.conf` |
 | Seek | Dial | Rotate to seek, press or tap to play / pause; shows the position |
 | Volume | Dial | Rotate to change the volume, press or tap to mute; shows the volume |
