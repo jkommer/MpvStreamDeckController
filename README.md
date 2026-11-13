@@ -22,6 +22,7 @@ keys and dials act on the running player directly and dials show live state such
 | Custom Command | Key | Sends any mpv command, written as in `input.conf` |
 | Seek | Dial | Rotate to seek, press or tap to play / pause; shows the position |
 | Volume | Dial | Rotate to change the volume, press or tap to mute; shows the volume |
+| Frame Step | Dial | Rotate to step forwards or backwards one frame per tick, press or tap to play / pause; shows the position, or the frame number while paused |
 | Playback Speed | Dial | Rotate to change the playback speed, press or tap to reset to 1.00x; shows the speed |
 
 ## Requirements

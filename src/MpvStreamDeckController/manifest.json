@@ -373,6 +373,28 @@
       "SupportedInMultiActions": true,
       "Tooltip": "Toggle Loop Playlist",
       "UUID": "com.jkommer.mpv.toggleloopplaylist"
+    },
+    {
+      "Icon": "Images/dial/21_frame_step_dial",
+      "Name": "Frame Step",
+      "Tooltip": "Rotate to step forwards or backwards frame by frame, press to pause / play",
+      "Controllers": [
+        "Encoder"
+      ],
+      "Encoder": {
+        "layout": "$B1",
+        "TriggerDescription": {
+          "Push": "Play / Pause",
+          "Rotate": "Frame Step",
+          "Touch": "Play / Pause"
+        }
+      },
+      "States": [
+        {
+          "Image": "Images/dial/21_frame_step_dial"
+        }
+      ],
+      "UUID": "com.jkommer.mpv.framestep"
     }
   ],
   "$schema": "https://schemas.elgato.com/streamdeck/plugins/manifest.json",

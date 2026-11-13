@@ -20,6 +20,13 @@ public static class MpvProperties
     public static readonly MpvProperty Chapters = Create("chapters");
     public static readonly MpvProperty TimePos = Create("time-pos", Math.Floor);
     public static readonly MpvProperty Duration = Create("duration", Math.Floor);
+    /// <summary>
+    /// time-pos again, but not rounded down to whole seconds, for working out the frame number. During playback this
+    /// changes with every frame rather than once a second, so every frame produces a new state for its observers; only
+    /// observe it where that precision is needed.
+    /// </summary>
+    public static readonly MpvProperty ExactTimePos = Create("time-pos");
+    public static readonly MpvProperty ContainerFps = Create("container-fps");
     public static readonly MpvProperty PlaybackSpeed = Create("speed");
     public static readonly MpvProperty Volume = Create("volume", RoundToTenth);
     public static readonly MpvProperty VolumeMax = Create("volume-max", RoundToTenth);

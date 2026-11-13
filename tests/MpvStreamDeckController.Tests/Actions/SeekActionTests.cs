@@ -8,14 +8,18 @@ public class SeekActionTests
     [Fact]
     public void CreateFeedback_WhenDisconnected_IsEmpty()
     {
-        SeekAction.CreateFeedback(TestStates.Disconnected).ShouldBe(default);
+        SeekAction
+            .CreateFeedback(TestStates.Disconnected)
+            .ShouldBe(default);
     }
 
     [Fact]
     public void CreateFeedback_WhenNothingIsPlaying_IsEmpty()
     {
         // Connected, but mpv has no time-pos while idle.
-        SeekAction.CreateFeedback(TestStates.Connected((MpvProperties.Duration, 300d))).ShouldBe(default);
+        SeekAction
+            .CreateFeedback(TestStates.Connected((MpvProperties.Duration, 300d)))
+            .ShouldBe(default);
     }
 
     [Theory]
@@ -38,7 +42,9 @@ public class SeekActionTests
     [InlineData(3600, 0, "1:00:00")]
     public void CreateFeedback_WhenThePositionOrDurationReachesAnHour_ShowsHours(double time, double duration, string text)
     {
-        SeekAction.CreateFeedback(TestStates.Connected((MpvProperties.TimePos, time), (MpvProperties.Duration, duration))).Text.ShouldBe(text);
+        SeekAction
+            .CreateFeedback(TestStates.Connected((MpvProperties.TimePos, time), (MpvProperties.Duration, duration))).Text
+            .ShouldBe(text);
     }
 
     [Fact]
