@@ -4,6 +4,8 @@
     <TargetFramework>net10.0</TargetFramework>
     <!-- The plugin is Windows only (see manifest.json); a fixed RID keeps the other platforms' native libraries out of the package. -->
     <RuntimeIdentifier>win-x64</RuntimeIdentifier>
+    <!-- Local builds use the installed .NET runtime. The GitHub build overrides this with -p:SelfContained=true, so
+         released packages include the runtime (see .github/workflows/build.yml). -->
     <SelfContained>false</SelfContained>
     <ImplicitUsings>enable</ImplicitUsings>
     <Nullable>enable</Nullable>

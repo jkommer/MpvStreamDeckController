@@ -70,14 +70,17 @@ jobs:
         "manifest=$manifest" >> $env:GITHUB_OUTPUT
         Write-Host "Version: $semVer (manifest $manifest)"
 
+    # SelfContained puts the .NET runtime in the plugin package, so users don't need to install it. It is set here
+    # rather than in the project file: local builds stay framework-dependent, which is smaller and quicker for
+    # developers, who have .NET installed anyway. Restore needs it too, to download the runtime pack.
     - name: Restore dependencies
-      run: dotnet restore
+      run: dotnet restore -p:SelfContained=true
     # Whitespace and code style, as "dotnet format" would leave them. Run "dotnet format" locally to fix a failure.
     - name: Check formatting
       run: dotnet format --verify-no-changes --no-restore
     # Warnings fail the GitHub build, so the code stays at zero warnings; local builds still only warn.
     - name: Build
-      run: dotnet build -c Release --no-restore -warnaserror -p:Version=${{ steps.version.outputs.semVer }}
+      run: dotnet build -c Release --no-restore -warnaserror -p:SelfContained=true -p:Version=${{ steps.version.outputs.semVer }}
     - name: Test
       run: dotnet test -c Release --no-build --verbosity normal --coverage --coverage-output-format cobertura --coverage-output "${{ runner.temp }}/coverage/coverage.cobertura.xml"
     # Shown on the run's summary page. Informational only: nothing fails on a low number.

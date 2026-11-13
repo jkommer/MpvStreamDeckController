@@ -35,7 +35,6 @@ keys and dials act on the running player directly and dials show live state such
 
 - Windows 10 or later
 - Stream Deck 6.4 or later
-- [.NET 10 Runtime](https://dotnet.microsoft.com/download/dotnet/10.0) (x64)
 - mpv
 
 ## Getting started
@@ -112,6 +111,9 @@ Requires the .NET 10 SDK (the version in `global.json` or a later 10.0 one) and 
 in the repository (`.config/dotnet-tools.json` and `package.json`) and installed by `dotnet tool restore` and `npm ci`.
 
 `build-and-deploy.ps1` builds and tests the plugin, validates and packs it, and reinstalls it into Stream Deck.
+
+Released packages are self-contained: the GitHub build includes the .NET runtime, so users don't need to install it.
+A local build is not, and runs on the .NET installed with the SDK.
 
 ### Releasing
 
