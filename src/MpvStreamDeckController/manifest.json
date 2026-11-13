@@ -316,7 +316,7 @@
       ],
       "SupportedInMultiActions": true,
       "Tooltip": "Volume Up",
-      "PropertyInspectorPath": "PropertyInspectors/VolumeKey.html",
+      "PropertyInspectorPath": "PropertyInspectors/Volume.html",
       "UUID": "com.jkommer.mpv.volumeup"
     },
     {
@@ -331,7 +331,7 @@
       ],
       "SupportedInMultiActions": true,
       "Tooltip": "Volume Down",
-      "PropertyInspectorPath": "PropertyInspectors/VolumeKey.html",
+      "PropertyInspectorPath": "PropertyInspectors/Volume.html",
       "UUID": "com.jkommer.mpv.volumedown"
     },
     {
@@ -441,6 +441,36 @@
       ],
       "PropertyInspectorPath": "PropertyInspectors/Delay.html",
       "UUID": "com.jkommer.mpv.audiodelay"
+    },
+    {
+      "Icon": "Images/key/25_seek_back",
+      "Name": "Seek Back",
+      "States": [
+        {
+          "Image": "Images/key/25_seek_back",
+          "TitleAlignment": "middle",
+          "FontSize": 12
+        }
+      ],
+      "SupportedInMultiActions": true,
+      "Tooltip": "Seek Back",
+      "PropertyInspectorPath": "PropertyInspectors/Seek.html",
+      "UUID": "com.jkommer.mpv.seekback"
+    },
+    {
+      "Icon": "Images/key/24_seek_forward",
+      "Name": "Seek Forward",
+      "States": [
+        {
+          "Image": "Images/key/24_seek_forward",
+          "TitleAlignment": "middle",
+          "FontSize": 12
+        }
+      ],
+      "SupportedInMultiActions": true,
+      "Tooltip": "Seek Forward",
+      "PropertyInspectorPath": "PropertyInspectors/Seek.html",
+      "UUID": "com.jkommer.mpv.seekforward"
     }
   ],
   "$schema": "https://schemas.elgato.com/streamdeck/plugins/manifest.json",

@@ -19,6 +19,25 @@ public class SeekSettingsTests
     }
 
     [Theory]
+    [InlineData("{\"seekInterval\":\"30\"}", 30)]
+    [InlineData("{\"seekInterval\":\"0,5\"}", SeekSettings.DefaultKeyInterval)]
+    [InlineData("{}", SeekSettings.DefaultKeyInterval)]
+    public void Read_Interval_WithADefaultInterval_ReturnsTheSettingOrThatDefault(string json, double expected)
+    {
+        SeekSettings
+            .Read(JObject.Parse(json), SeekSettings.DefaultKeyInterval).Interval
+            .ShouldBe(expected);
+    }
+
+    [Fact]
+    public void Read_WithNullSettingsAndADefaultInterval_UsesThatDefault()
+    {
+        SeekSettings
+            .Read(null, SeekSettings.DefaultKeyInterval)
+            .ShouldBe(new(SeekSettings.DefaultKeyInterval));
+    }
+
+    [Theory]
     [InlineData("{\"seekType\":\"exact\"}", "exact")]
     [InlineData("{\"seekType\":\"keyframes\"}", "keyframes")]
     [InlineData("{\"seekType\":\"\"}", null)]
