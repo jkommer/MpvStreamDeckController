@@ -74,6 +74,7 @@ A ready-to-use helper script is in `tools/icon_toolkit.py`. It encodes the tile,
 | `21_frame_step_dial` (dial only) | Dial frame step control | Three film frames in a row (white outlined frames either side of a larger solid centre frame) above the seek dial's `«  »` | centre frame, chevrons |
 | `22_sub_delay_dial` / `23_audio_delay_dial` (dial only) | Dial subtitle / audio delay control | The caption box, or the bold speaker at 0.8 scale, above a row of `«`, a small clock and `»` | caption lines or waves, clock, chevrons |
 | `24_seek_forward` / `25_seek_back` | Seek forward / back | The progress bar and knob from `09_seek`, with the knob right of centre for forward and left of centre for back | filled progress, `»` / `«` |
+| `26_stop` | Stop | Solid white rounded square | none |
 
 Toggle actions: provide an **on** icon (normal palette) and an **off** icon. The off icon is the on icon with identical geometry (do not alter shapes, heights or indicator elements), recoloured entirely to `#8a8a94`, with a diagonal slash from lower-left to upper-right (`M30 112 L114 32`, `stroke-width 8`, round caps) drawn on top. Nothing in the glyph may be rearranged or enlarged so that it collides with other elements. The same slash is used for the muted volume icon.
 

@@ -471,6 +471,21 @@
       "Tooltip": "Seek Forward",
       "PropertyInspectorPath": "PropertyInspectors/Seek.html",
       "UUID": "com.jkommer.mpv.seekforward"
+    },
+    {
+      "Icon": "Images/key/26_stop",
+      "Name": "Stop",
+      "States": [
+        {
+          "Image": "Images/key/26_stop",
+          "TitleAlignment": "middle",
+          "FontSize": 12
+        }
+      ],
+      "SupportedInMultiActions": true,
+      "Tooltip": "Stop playback and clear the playlist",
+      "UUID": "com.jkommer.mpv.stop"
+    },
     }
   ],
   "$schema": "https://schemas.elgato.com/streamdeck/plugins/manifest.json",

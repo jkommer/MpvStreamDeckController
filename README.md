@@ -8,11 +8,13 @@ keys and dials act on the running player directly and dials show live state such
 | Action | Type | What it does |
 |---|---|---|
 | Play / Pause | Key | Toggles pause |
+| Stop | Key | Stops playback and clears the playlist; mpv then closes unless it is set to stay open (see below) |
 | Cycle Audio / Cycle Subtitles | Key | Switches to the next audio or subtitle track |
 | Next / Previous Chapter | Key | Jumps between chapters, continuing into the next or previous file at the ends (optional) |
 | Next / Previous Playlist Entry | Key | Moves through the playlist |
 | Shuffle Playlist | Key | Puts the playlist in a random order; the current file keeps playing |
 | Toggle Loop File / Toggle Loop Playlist | Key | Repeats the current file, or the whole playlist, until turned off; the key shows whether it's on |
+| A-B Loop | Key | First press sets the start of a loop, the second its end, the third clears it; the key shows which step it's at |
 | Toggle Acompressor | Key | Toggles the audio compressor (needs `acompressor.lua`, see below); the key shows whether it's on |
 | Toggle On Top | Key | Toggles whether the mpv window stays on top of other windows; the key shows whether it's on |
 | Toggle Fullscreen | Key | Toggles fullscreen; the key shows whether it's on |
@@ -76,6 +78,10 @@ seeking when nothing is loaded. Rejected commands are also written to the plugin
 Only one mpv instance can own the `mpvsocket` pipe, normally the first one started. The others can't be controlled
 by the plugin. Closing all mpv instances and opening a single one should ensure that it owns and opens the `mpvsocket` 
 pipe
+
+**Stop closes mpv.**
+That is mpv's default: with nothing left to play it exits. Add `idle=yes` to `mpv.conf` (and `force-window=yes` to keep
+the window) if you want it to stay open after Stop.
 
 **Toggle Acompressor does nothing.**
 It relies on mpv's [`acompressor.lua`](https://github.com/mpv-player/mpv/blob/master/TOOLS/lua/acompressor.lua)
