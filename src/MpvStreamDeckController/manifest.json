@@ -395,6 +395,52 @@
         }
       ],
       "UUID": "com.jkommer.mpv.framestep"
+    },
+    {
+      "Icon": "Images/dial/22_sub_delay_dial",
+      "Name": "Subtitle Delay",
+      "Tooltip": "Rotate to change mpv's subtitle delay, press to reset to 0",
+      "Controllers": [
+        "Encoder"
+      ],
+      "Encoder": {
+        "layout": "$A1",
+        "TriggerDescription": {
+          "Push": "Reset to 0",
+          "Rotate": "Subtitle Delay",
+          "Touch": "Reset to 0"
+        }
+      },
+      "States": [
+        {
+          "Image": "Images/dial/22_sub_delay_dial"
+        }
+      ],
+      "PropertyInspectorPath": "PropertyInspectors/Delay.html",
+      "UUID": "com.jkommer.mpv.subtitledelay"
+    },
+    {
+      "Icon": "Images/dial/23_audio_delay_dial",
+      "Name": "Audio Delay",
+      "Tooltip": "Rotate to change mpv's audio delay, press to reset to 0",
+      "Controllers": [
+        "Encoder"
+      ],
+      "Encoder": {
+        "layout": "$A1",
+        "TriggerDescription": {
+          "Push": "Reset to 0",
+          "Rotate": "Audio Delay",
+          "Touch": "Reset to 0"
+        }
+      },
+      "States": [
+        {
+          "Image": "Images/dial/23_audio_delay_dial"
+        }
+      ],
+      "PropertyInspectorPath": "PropertyInspectors/Delay.html",
+      "UUID": "com.jkommer.mpv.audiodelay"
     }
   ],
   "$schema": "https://schemas.elgato.com/streamdeck/plugins/manifest.json",

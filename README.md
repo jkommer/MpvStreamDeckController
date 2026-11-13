@@ -24,6 +24,7 @@ keys and dials act on the running player directly and dials show live state such
 | Volume | Dial | Rotate to change the volume, press or tap to mute; shows the volume |
 | Frame Step | Dial | Rotate to step forwards or backwards one frame per tick, press or tap to play / pause; shows the position, or the frame number while paused |
 | Playback Speed | Dial | Rotate to change the playback speed, press or tap to reset to 1.00x; shows the speed |
+| Subtitle Delay / Audio Delay | Dial | Rotate to make the subtitles or audio come later or earlier, press or tap to reset to 0; shows the delay in milliseconds |
 
 ## Requirements
 
@@ -57,6 +58,7 @@ used. By default nothing is shown.
 - **Volume**: the percentage per dial tick.
 - **Volume Up / Volume Down**: the percentage per key press (2 by default).
 - **Playback Speed**: the speed change per dial tick (0.1 by default).
+- **Subtitle Delay / Audio Delay**: the milliseconds per dial tick (100 by default).
 - **Custom Command**: the command, e.g. `cycle pause`, `seek 30` or `add volume -5; show-text "${volume}"`. Several
   commands can be separated with `;`. Tick *Expand ${property}* to have mpv fill in property values.
 
@@ -80,6 +82,13 @@ script; copy it into your mpv `scripts` folder. The script also provides key bin
 **Seeking jumps further than the configured interval.**
 mpv seeks to keyframes by default for relative seeks. Set the seek type to *Exact*, or set `hr-seek=yes` in
 `mpv.conf`.
+
+**The picture stutters when I turn Audio Delay, or the delay seems to do nothing.**
+That is how mpv applies a change to `audio-delay`; its own Ctrl++ / Ctrl+- keys behave the same. mpv doesn't move the
+audio, it retimes the video against it, so the picture briefly freezes or skips frames to catch up. With
+`video-sync=display-resample` it instead corrects by playing the audio very slightly faster or slower (0.125% by
+default, see `video-sync-max-audio-change`), so a change of 100 ms can take over a minute to take full effect. Seeking,
+even by a second, makes mpv resynchronise with the new delay at once.
 
 **My custom command works in `input.conf` but shows nothing on screen here.**
 Unlike `input.conf`, the plugin doesn't show an OSD unless one is selected in the action's settings, and

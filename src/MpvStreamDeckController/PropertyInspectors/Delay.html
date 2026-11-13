@@ -1,0 +1,20 @@
+<!DOCTYPE html>
+<html>
+<head lang="en">
+    <meta charset="utf-8" />
+    <script src="sdpi-components.js"></script>
+    <script src="scripts.js"></script>
+    <link rel="stylesheet" href="styles.css" />
+</head>
+<body>
+    <sdpi-item label="Step (ms)">
+        <sdpi-textfield setting="delayStep" placeholder="100" pattern="\d*\.?\d+"></sdpi-textfield>
+    </sdpi-item>
+    <mpv-osd-select></mpv-osd-select>
+    <details>
+        <summary>About these settings</summary>
+        <p><b>Step</b> is the number of milliseconds to change the delay by per dial tick, e.g. <code>100</code> or <code>25</code>. Empty or invalid values use 100.</p>
+        <p>Turning clockwise makes the subtitles or audio come later, anticlockwise earlier. Press the dial to reset the delay to 0.</p>
+    </details>
+</body>
+</html>
