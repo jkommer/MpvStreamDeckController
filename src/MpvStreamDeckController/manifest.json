@@ -269,6 +269,20 @@
       "SupportedInMultiActions": true,
       "Tooltip": "Toggle Subtitle Visibility",
       "UUID": "com.jkommer.mpv.togglesubtitlevisibility"
+    },
+    {
+      "Icon": "Images/key/16_shuffle_playlist",
+      "Name": "Shuffle Playlist",
+      "States": [
+        {
+          "Image": "Images/key/16_shuffle_playlist",
+          "TitleAlignment": "middle",
+          "FontSize": 12
+        }
+      ],
+      "SupportedInMultiActions": true,
+      "Tooltip": "Shuffle Playlist",
+      "UUID": "com.jkommer.mpv.shuffleplaylist"
     }
   ],
   "$schema": "https://schemas.elgato.com/streamdeck/plugins/manifest.json",
