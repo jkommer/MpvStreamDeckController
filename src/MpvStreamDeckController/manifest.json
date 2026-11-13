@@ -539,6 +539,21 @@
       ],
       "PropertyInspectorPath": "PropertyInspectors/CustomDial.html",
       "UUID": "com.jkommer.mpv.customdial"
+    },
+    {
+      "Icon": "Images/key/29_quit",
+      "Name": "Quit",
+      "States": [
+        {
+          "Image": "Images/key/29_quit",
+          "TitleAlignment": "middle",
+          "FontSize": 12
+        }
+      ],
+      "SupportedInMultiActions": true,
+      "Tooltip": "Quit mpv",
+      "PropertyInspectorPath": "PropertyInspectors/Quit.html",
+      "UUID": "com.jkommer.mpv.quit"
     }
   ],
   "$schema": "https://schemas.elgato.com/streamdeck/plugins/manifest.json",

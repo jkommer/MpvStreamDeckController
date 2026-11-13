@@ -9,6 +9,7 @@ keys and dials act on the running player directly and dials show live state such
 |---|---|---|
 | Play / Pause | Key | Toggles pause; the key shows whether mpv is playing or paused |
 | Stop | Key | Stops playback and clears the playlist; mpv then closes unless it is set to stay open (see below) |
+| Quit | Key | Closes mpv, optionally remembering the playback position |
 | Cycle Audio / Cycle Subtitles | Key | Switches to the next audio or subtitle track |
 | Next / Previous Chapter | Key | Jumps between chapters, continuing into the next or previous file at the ends (optional) |
 | Next / Previous Playlist Entry | Key | Moves through the playlist |
@@ -68,6 +69,9 @@ used. By default nothing is shown.
   commands can be separated with `;`. Tick *Expand ${property}* to have mpv fill in property values.
 - **Custom Dial**: a command each for clockwise, anticlockwise and press, written like a Custom Command; an empty
   one does nothing. The dial shows no value itself, so pick an OSD mode to see the result in mpv.
+- **Quit**: whether mpv remembers the playback position, so the file resumes there next time (off by default). This
+  has no effect if `no-resume-playback` (`resume-playback=no`) is set in `mpv.conf`: mpv still saves the position but
+  doesn't restore it.
 
 For plugin settings use a full stop for decimals (`0.5`, not `0,5`).
 

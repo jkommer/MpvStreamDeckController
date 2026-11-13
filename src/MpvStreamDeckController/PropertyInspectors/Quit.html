@@ -1,0 +1,20 @@
+<!DOCTYPE html>
+<html>
+<head lang="en">
+    <meta charset="utf-8" />
+    <script src="sdpi-components.js"></script>
+    <script src="scripts.js"></script>
+    <link rel="stylesheet" href="styles.css" />
+</head>
+<body>
+    <sdpi-item label="Position">
+        <sdpi-checkbox setting="savePosition" label="Remember where playback stopped"></sdpi-checkbox>
+    </sdpi-item>
+    <details>
+        <summary>About these settings</summary>
+        <p><b>Position</b>: when ticked, mpv saves the playback position before closing (<code>quit-watch-later</code>) and resumes there the next time the file is opened.</p>
+        <p>This does not work if <code>no-resume-playback</code> (<code>resume-playback=no</code>) is set in your mpv.conf: mpv still saves the position but doesn't restore it.</p>
+        <p>When unticked, the key sends a plain <code>quit</code>; mpv then only saves the position if <code>save-position-on-quit</code> is set in your mpv.conf.</p>
+    </details>
+</body>
+</html>
