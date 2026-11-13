@@ -21,6 +21,7 @@ keys and dials act on the running player directly and dials show live state such
 | Toggle Fullscreen | Key | Toggles fullscreen; the key shows whether it's on |
 | Toggle Subtitle Visibility | Key | Shows or hides subtitles without changing the selected track; the key shows whether they're visible |
 | Toggle Deband | Key | Toggles mpv's debanding filter, which smooths visible colour steps in gradients; the key shows whether it's on |
+| Toggle Interpolation | Key | Toggles mpv's frame interpolation, which blends frames for smoother motion (needs a `video-sync=display-...` mode, see below); the key shows whether it's on |
 | Toggle Mute | Key | Mutes or unmutes; the key shows whether it's muted |
 | Volume Up / Volume Down | Key | Changes the volume by a configurable step |
 | Seek Back / Seek Forward | Key | Seeks backwards or forwards by a configurable number of seconds |
@@ -93,6 +94,11 @@ script; copy it into your mpv `scripts` folder. The script also provides key bin
 **Seeking jumps further than the configured interval.**
 mpv seeks to keyframes by default for relative seeks. Set the seek type to *Exact*, or set `hr-seek=yes` in
 `mpv.conf`.
+
+**Toggle Interpolation turns on but the picture looks the same.**
+mpv only interpolates when `video-sync` is set to one of the `display-...` modes, e.g. `video-sync=display-resample` in
+`mpv.conf`, and only with the `gpu` or `gpu-next` video output. The key shows the `interpolation` option, not whether
+mpv is actually interpolating.
 
 **The picture stutters when I turn Audio Delay, or the delay seems to do nothing.**
 That is how mpv applies a change to `audio-delay`; its own Ctrl++ / Ctrl+- keys behave the same. mpv doesn't move the

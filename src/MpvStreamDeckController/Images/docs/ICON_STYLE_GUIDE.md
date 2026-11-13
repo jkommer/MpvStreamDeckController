@@ -80,6 +80,7 @@ A ready-to-use helper script is in `tools/icon_toolkit.py`. It encodes the tile,
 | `28_custom_dial` (dial only) | Dial that runs custom mpv commands | The terminal window from `10_custom_command`, bolder, above the seek dial's `«  »` | prompt chevron, chevrons |
 | `29_quit` | Quit mpv | Power symbol: white ring open at the top with a vertical bar through the gap | bar |
 | `30a_deband_on` / `30b_deband_off` | Deband on / off | Descending white staircase (the colour bands) above a smooth S-curve following the same slope (the debanded gradient); both descend so the off-state slash crosses them | curve; off = everything `#8a8a94` plus slash |
+| `31a_interpolation_on` / `31b_interpolation_off` | Frame interpolation on / off | Two solid white frames (the real frames) with a dotted frame outline between them (the generated in-between frame) | dotted frame; off = everything `#8a8a94` plus slash |
 
 Toggle actions: provide an **on** icon (normal palette) and an **off** icon. The off icon is the on icon with identical geometry (do not alter shapes, heights or indicator elements), recoloured entirely to `#8a8a94`, with a diagonal slash from lower-left to upper-right (`M30 112 L114 32`, `stroke-width 8`, round caps) drawn on top. Nothing in the glyph may be rearranged or enlarged so that it collides with other elements. The same slash is used for the muted volume icon.
 

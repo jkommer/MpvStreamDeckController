@@ -574,6 +574,26 @@
       "SupportedInMultiActions": true,
       "Tooltip": "Toggle Deband",
       "UUID": "com.jkommer.mpv.toggledeband"
+    },
+    {
+      "Icon": "Images/key/31a_interpolation_on",
+      "Name": "Toggle Interpolation",
+      "States": [
+        {
+          "Image": "Images/key/31b_interpolation_off",
+          "TitleAlignment": "middle",
+          "FontSize": 12
+        },
+        {
+          "Image": "Images/key/31a_interpolation_on",
+          "TitleAlignment": "middle",
+          "FontSize": 12
+        }
+      ],
+      "DisableAutomaticStates": true,
+      "SupportedInMultiActions": true,
+      "Tooltip": "Toggle Interpolation",
+      "UUID": "com.jkommer.mpv.toggleinterpolation"
     }
   ],
   "$schema": "https://schemas.elgato.com/streamdeck/plugins/manifest.json",
