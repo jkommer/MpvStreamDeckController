@@ -30,14 +30,14 @@ def dial_svg(inner):
     return f'<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 144 144" width="144" height="144">{inner}</svg>'
 
 def export(name, inner, out="out", dial=False, off=False):
-    """Write SVG files only (keys, action-list icons and dials natively support SVG).
-    key/NAME.svg, action/NAME.svg and, if dial=True, dial/NAME_dial.svg (transparent)."""
-    for sub in ("key", "action", "dial"):
-        os.makedirs(f"{out}/{sub}", exist_ok=True)
-    open(f"{out}/key/{name}.svg", "w").write(key_svg(inner, off=off))
-    open(f"{out}/action/{name}.svg", "w").write(key_svg(inner, 40, off=off))  # root tag only is resized
+    """Write SVG files only (keys and dials natively support SVG): key/NAME.svg, or if dial=True
+    dial/NAME_dial.svg (transparent). The manifest reuses the same file as the action-list icon."""
+    sub = "dial" if dial else "key"
+    os.makedirs(f"{out}/{sub}", exist_ok=True)
     if dial:
         open(f"{out}/dial/{name}_dial.svg", "w").write(dial_svg(inner))
+    else:
+        open(f"{out}/key/{name}.svg", "w").write(key_svg(inner, off=off))
 
 def export_plugin_icon(svg_text, out="out", name="mpv"):
     """Plugin icon (manifest 'Icon') does not support SVG, so it needs PNGs.

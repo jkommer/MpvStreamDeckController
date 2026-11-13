@@ -87,7 +87,7 @@ Toggle actions: provide an **on** icon (normal palette) and an **off** icon. The
 | Variant | Where | Background | Colours | Notes |
 |---|---|---|---|---|
 | **Key icon** | Action state `Image` | Tile | Full palette | Primary design |
-| **Action-list icon** | Action `Icon` | Tile (same as key) | Full palette | Same SVG, `width/height 40` |
+| **Action-list icon** | Action `Icon` | Same as the action's image | Same as the action's image | Not a separate file: the manifest `Icon` points at the action's key icon (the normal-palette **on** icon for toggles), or at its dial icon for dial actions. Play/Pause is the one exception, with its own `key/07_play_pause` |
 | **Dial icon** | Encoder/touch-strip state `Image` | **Transparent** | Accent + white, no tile | Bolder strokes, simple shapes |
 | **Plugin icon** | Manifest `Icon` | Tile, 256 units | Full palette | Play triangle in a progress ring with knob |
 | **Category icon** | Manifest `CategoryIcon` | **Transparent** | Accent only | Thicker ring (stroke 22), no white (must be visible on light and dark) |
@@ -100,13 +100,13 @@ Do not use white-on-transparent for anything except the dial icon: it is invisib
 | Asset | Format | Folder / filename |
 |---|---|---|
 | Key icon | **SVG only** | `key/NN_name.svg` |
-| Action-list icon | **SVG only** | `action/NN_name.svg` (same tile, root `width/height 40`) |
+| Action-list icon | none | No file of its own: the key or dial SVG is reused |
 | Dial icon | **SVG only** | `dial/NN_name_dial.svg` (transparent) |
 | Category icon | **SVG only** | `plugin/svg/mpv-category.svg` |
 | Plugin icon | **SVG + PNG 256x256 + PNG @2x 512x512** | `plugin/svg/mpv.svg` (source), `plugin/png/mpv.png`, `plugin/png/mpv@2x.png` |
 | Windows icon | ICO, sizes 16, 24, 32, 48, 64, 128, 256 | `plugin/mpv.ico` (PNG-compressed entries) |
 
-**Do not generate PNGs for key, action-list, dial or category icons.** Stream Deck supports SVG natively for these, so SVG is the only deliverable. The plugin icon (manifest `Icon`) is the exception because it must be a PNG. Keep `plugin/svg/mpv.svg` as the source and render both PNGs from it (256x256 and 512x512 for `@2x`); verify the pixel dimensions after rendering (the toolkit's `export_plugin_icon` asserts them). PNG previews and the `.ico` are generated separately and are not part of the manifest.
+**Do not generate PNGs for key, dial or category icons.** Stream Deck supports SVG natively for these, so SVG is the only deliverable. The plugin icon (manifest `Icon`) is the exception because it must be a PNG. Keep `plugin/svg/mpv.svg` as the source and render both PNGs from it (256x256 and 512x512 for `@2x`); verify the pixel dimensions after rendering (the toolkit's `export_plugin_icon` asserts them). PNG previews and the `.ico` are generated separately and are not part of the manifest.
 
 - **Naming:** `NN_verb_object` in snake_case with a two-digit sequence number (`30_...` for the next new icon). Use `a`/`b` suffixes for states (`08a_..._on`, `08b_..._off`). Dial versions end in `_dial`.
 - **Rasterizing** (only for the plugin icon, the `.ico` and preview images): use `cairosvg` (`cairosvg.svg2png(bytestring=..., output_width=N, output_height=N)`), always rendered from the SVG at the target size; never upscale a smaller PNG.
@@ -114,17 +114,17 @@ Do not use white-on-transparent for anything except the dial icon: it is invisib
 ## 8. Manifest rules
 
 - **File extensions are not required** in manifest image paths: Stream Deck resolves `.svg`/`.png` (and `@2x`) from the base name. Use extension-less paths, as in the original manifest (`Images/key/03_next_chapter`). Because paths have no extension, **never put an SVG and a PNG with the same base name in the same folder** (Stream Deck cannot choose between `mpv.svg` and `mpv.png`). Keep them in separate `svg/` and `png/` subfolders, as the `plugin/` folder does.
-- Plugin-level `Icon` must resolve to a PNG: `Images/plugin/png/mpv` -> `mpv.png` (256x256) with `mpv@2x.png` (512x512) beside it. All other images (key, action-list, dial, category) are **SVG**.
-- Folder layout inside the plugin: `Images/key/`, `Images/action/`, `Images/dial/` (SVG files), plus `Images/plugin/png/` (`mpv.png`, `mpv@2x.png`) and `Images/plugin/svg/` (`mpv.svg` source, `mpv-category.svg`). Key/action/dial folders hold SVG only, so they need no `svg/`/`png/` split.
-- Per action: `Icon` -> `Images/action/<name>`; each state `Image` -> `Images/key/<name>`. Dial/encoder actions use `Images/dial/<name>_dial`. `CategoryIcon` -> `Images/plugin/svg/mpv-category`; plugin `Icon` -> `Images/plugin/png/mpv`.
+- Plugin-level `Icon` must resolve to a PNG: `Images/plugin/png/mpv` -> `mpv.png` (256x256) with `mpv@2x.png` (512x512) beside it. All other images (key, dial, category) are **SVG**.
+- Folder layout inside the plugin: `Images/key/`, `Images/dial/` (SVG files), plus `Images/plugin/png/` (`mpv.png`, `mpv@2x.png`) and `Images/plugin/svg/` (`mpv.svg` source, `mpv-category.svg`). There is no `Images/action/` folder. The key and dial folders hold SVG only, so they need no `svg/`/`png/` split.
+- Per key action: `Icon` and each state `Image` -> `Images/key/<name>`; for a toggle, `Icon` is the normal-palette on icon, state 0 the off icon and state 1 the on icon. Dial/encoder actions use `Images/dial/<name>_dial` for both `Icon` and the state `Image`. `CategoryIcon` -> `Images/plugin/svg/mpv-category`; plugin `Icon` -> `Images/plugin/png/mpv`.
 
 ## 9. Pitfalls already encountered
 
-1. **Resizing the root `<svg>` tag:** use `.replace('width="144" height="144"', 'width="40" height="40"', 1)` with count `1`. Without it, the tile `<rect width="144" height="144">` is resized too and the tile shrinks into a corner.
-2. **White-on-transparent action icons** looked blank in light viewers. Use the tile version.
+1. **Resizing the root `<svg>` tag** (e.g. for a preview): use `.replace('width="144" height="144"', 'width="40" height="40"', 1)` with count `1`. Without it, the tile `<rect width="144" height="144">` is resized too and the tile shrinks into a corner.
+2. **White-on-transparent icons for key actions** looked blank in light viewers. Use the tile version; only dial actions use the transparent dial icon.
 3. **"File not found" validator errors** (including for the original `Images/mpv`) were a sign the `Images` folder wasn't where the validator looked, not a sign that extensions are required. Extension-less paths are valid; check that the files exist at the expected location first.
 4. **Small sizes (16-32 px):** the thin plugin ring turns to mush. Use the bolder simplified variant (ring stroke 24, knob 24, triangle stroke 14, scaled to 0.74 inside a tile with `rx=52`).
-5. **Unnecessary PNGs:** keys, dials, action-list and category icons are SVG only; do not generate PNG or `@2x` files for them.
+5. **Unnecessary PNGs:** key, dial and category icons are SVG only; do not generate PNG or `@2x` files for them.
 
 ## 10. Process for creating a new icon
 
@@ -144,11 +144,11 @@ Do not use white-on-transparent for anything except the dial icon: it is invisib
 - [ ] `»` / `«` direction convention followed; highlighted item in accent per the highlight convention
 - [ ] Off/disabled states are the on icon in `#8a8a94` with the standard slash, on the grey off-state tile (no purple visible)
 - [ ] Legible at 20 px and on white and dark backgrounds
-- [ ] SVG exported for every needed variant (key, action-list, dial, category); **no PNGs** for those
+- [ ] SVG exported for every needed variant (key, dial, category); **no PNGs** for those, and no separate action-list file
 - [ ] Plugin icon only: SVG source + 256x256 PNG + 512x512 `@2x` PNG, dimensions verified
 - [ ] Manifest paths are extension-less base names matching files that exist in `Images/` (plugin `Icon` resolves to the PNG pair)
 - [ ] No trademarked logos or characters
 
 ## 12. Prompt template for an AI assistant
 
-> Create a new Stream Deck icon for the MPV plugin: **\<action description\>**. Follow `docs/ICON_STYLE_GUIDE.md` exactly. Use `tools/icon_toolkit.py` to build the SVG on the standard 144x144 purple tile (white glyph, lavender `#d49bff` accents, no text). Use `»`/`«` chevrons if the action has a direction. Export SVG only: key, action-list and, if it is a dial action, a transparent dial version (no PNGs). Name it `NN_verb_object`. Show a preview on white and dark backgrounds and list the manifest lines to add.
+> Create a new Stream Deck icon for the MPV plugin: **\<action description\>**. Follow `docs/ICON_STYLE_GUIDE.md` exactly. Use `tools/icon_toolkit.py` to build the SVG on the standard 144x144 purple tile (white glyph, lavender `#d49bff` accents, no text). Use `»`/`«` chevrons if the action has a direction. Export SVG only: a key icon, or for a dial action a transparent dial version (no PNGs, no separate action-list icon). Name it `NN_verb_object`. Show a preview on white and dark backgrounds and list the manifest lines to add.
