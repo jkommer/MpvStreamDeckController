@@ -57,7 +57,8 @@ A ready-to-use helper script is in `tools/icon_toolkit.py`. It encodes the tile,
 | `04_prev_chapter` | Previous chapter | Same, highlight on left | left segment, bookmark, `«` |
 | `05_next_playlist_entry` | Next playlist entry | Three bulleted list rows | last row, `»` |
 | `06_prev_playlist_entry` | Previous playlist entry | Same | first row, `«` |
-| `07_play_pause` | Play/pause | White play triangle + accent pause bars | pause bars |
+| `07_play_pause` | Play/pause (action-list icon) | White play triangle + accent pause bars | pause bars |
+| `07a_state_play` / `07b_state_pause` | Play/pause key while playing / paused | Large accent triangle / two bars | whole glyph |
 | `08a_acompressor_on` | Compressor on | Waveform clamped between dashed lines + inward arrows | dashed lines, arrows |
 | `08b_acompressor_off` | Compressor off | Identical to the on icon (same clamped waveform, limit lines, arrows) | all `#8a8a94`, plus slash |
 | `09_seek` | Seek | Progress bar + round knob + `«  »` | filled progress, chevrons |

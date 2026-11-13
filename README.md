@@ -7,7 +7,7 @@ keys and dials act on the running player directly and dials show live state such
 
 | Action | Type | What it does |
 |---|---|---|
-| Play / Pause | Key | Toggles pause |
+| Play / Pause | Key | Toggles pause; the key shows whether mpv is playing or paused |
 | Stop | Key | Stops playback and clears the playlist; mpv then closes unless it is set to stay open (see below) |
 | Cycle Audio / Cycle Subtitles | Key | Switches to the next audio or subtitle track |
 | Next / Previous Chapter | Key | Jumps between chapters, continuing into the next or previous file at the ends (optional) |

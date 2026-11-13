@@ -91,11 +91,17 @@
       "Name": "Play/Pause",
       "States": [
         {
-          "Image": "Images/key/07_play_pause",
+          "Image": "Images/key/07a_state_play",
+          "TitleAlignment": "middle",
+          "FontSize": 12
+        },
+        {
+          "Image": "Images/key/07b_state_pause",
           "TitleAlignment": "middle",
           "FontSize": 12
         }
       ],
+      "DisableAutomaticStates": true,
       "SupportedInMultiActions": true,
       "Tooltip": "Play / Pause",
       "UUID": "com.jkommer.mpv.playpause"
