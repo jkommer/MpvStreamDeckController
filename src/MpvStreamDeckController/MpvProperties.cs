@@ -28,6 +28,8 @@ public static class MpvProperties
     public static readonly MpvProperty OnTop = Create("ontop");
     public static readonly MpvProperty Fullscreen = Create("fullscreen");
     public static readonly MpvProperty SubVisibility = Create("sub-visibility");
+    public static readonly MpvProperty LoopFile = Create("loop-file");
+    public static readonly MpvProperty LoopPlaylist = Create("loop-playlist");
     public static readonly MpvProperty ACompressor = Create("af", fromJson: FilterEnabled("acompressor"));
 
     public static IReadOnlyDictionary<long, MpvProperty> All => _createdProperties;

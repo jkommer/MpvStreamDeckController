@@ -12,6 +12,7 @@ keys and dials act on the running player directly and dials show live state such
 | Next / Previous Chapter | Key | Jumps between chapters, continuing into the next or previous file at the ends (optional) |
 | Next / Previous Playlist Entry | Key | Moves through the playlist |
 | Shuffle Playlist | Key | Puts the playlist in a random order; the current file keeps playing |
+| Toggle Loop File / Toggle Loop Playlist | Key | Repeats the current file, or the whole playlist, until turned off; the key shows whether it's on |
 | Toggle Acompressor | Key | Toggles the audio compressor (needs `acompressor.lua`, see below); the key shows whether it's on |
 | Toggle On Top | Key | Toggles whether the mpv window stays on top of other windows; the key shows whether it's on |
 | Toggle Fullscreen | Key | Toggles fullscreen; the key shows whether it's on |

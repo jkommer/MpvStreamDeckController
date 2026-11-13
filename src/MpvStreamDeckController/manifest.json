@@ -333,6 +333,46 @@
       "Tooltip": "Volume Down",
       "PropertyInspectorPath": "PropertyInspectors/VolumeKey.html",
       "UUID": "com.jkommer.mpv.volumedown"
+    },
+    {
+      "Icon": "Images/key/19a_loop_file_on",
+      "Name": "Toggle Loop File",
+      "States": [
+        {
+          "Image": "Images/key/19b_loop_file_off",
+          "TitleAlignment": "middle",
+          "FontSize": 12
+        },
+        {
+          "Image": "Images/key/19a_loop_file_on",
+          "TitleAlignment": "middle",
+          "FontSize": 12
+        }
+      ],
+      "DisableAutomaticStates": true,
+      "SupportedInMultiActions": true,
+      "Tooltip": "Toggle Loop File",
+      "UUID": "com.jkommer.mpv.toggleloopfile"
+    },
+    {
+      "Icon": "Images/key/20a_loop_playlist_on",
+      "Name": "Toggle Loop Playlist",
+      "States": [
+        {
+          "Image": "Images/key/20b_loop_playlist_off",
+          "TitleAlignment": "middle",
+          "FontSize": 12
+        },
+        {
+          "Image": "Images/key/20a_loop_playlist_on",
+          "TitleAlignment": "middle",
+          "FontSize": 12
+        }
+      ],
+      "DisableAutomaticStates": true,
+      "SupportedInMultiActions": true,
+      "Tooltip": "Toggle Loop Playlist",
+      "UUID": "com.jkommer.mpv.toggleloopplaylist"
     }
   ],
   "$schema": "https://schemas.elgato.com/streamdeck/plugins/manifest.json",
