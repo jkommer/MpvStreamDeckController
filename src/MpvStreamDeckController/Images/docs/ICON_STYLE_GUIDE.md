@@ -75,6 +75,7 @@ A ready-to-use helper script is in `tools/icon_toolkit.py`. It encodes the tile,
 | `22_sub_delay_dial` / `23_audio_delay_dial` (dial only) | Dial subtitle / audio delay control | The caption box, or the bold speaker at 0.8 scale, above a row of `«`, a small clock and `»` | caption lines or waves, clock, chevrons |
 | `24_seek_forward` / `25_seek_back` | Seek forward / back | The progress bar and knob from `09_seek`, with the knob right of centre for forward and left of centre for back | filled progress, `»` / `«` |
 | `26_stop` | Stop | Solid white rounded square | none |
+| `27a_ab_loop_on` / `27b_ab_loop_off` / `27c_ab_loop_start` | A-B loop: looping / off / only the start set | Timeline bar with two round knobs (the A and B points) and an arc with a single `>` arrowhead from B back to A | on: segment between the knobs, both knob rings, arc; start: the A knob's ring, with the arc dimmed; off = everything `#8a8a94` plus slash |
 
 Toggle actions: provide an **on** icon (normal palette) and an **off** icon. The off icon is the on icon with identical geometry (do not alter shapes, heights or indicator elements), recoloured entirely to `#8a8a94`, with a diagonal slash from lower-left to upper-right (`M30 112 L114 32`, `stroke-width 8`, round caps) drawn on top. Nothing in the glyph may be rearranged or enlarged so that it collides with other elements. The same slash is used for the muted volume icon.
 

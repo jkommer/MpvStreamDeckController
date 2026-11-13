@@ -39,6 +39,8 @@ public static class MpvProperties
     public static readonly MpvProperty AudioDelay = Create("audio-delay");
     public static readonly MpvProperty LoopFile = Create("loop-file");
     public static readonly MpvProperty LoopPlaylist = Create("loop-playlist");
+    public static readonly MpvProperty AbLoopA = Create("ab-loop-a");
+    public static readonly MpvProperty AbLoopB = Create("ab-loop-b");
     public static readonly MpvProperty ACompressor = Create("af", fromJson: FilterEnabled("acompressor"));
 
     public static IReadOnlyDictionary<long, MpvProperty> All => _createdProperties;

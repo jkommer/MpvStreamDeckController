@@ -79,10 +79,6 @@ Only one mpv instance can own the `mpvsocket` pipe, normally the first one start
 by the plugin. Closing all mpv instances and opening a single one should ensure that it owns and opens the `mpvsocket` 
 pipe
 
-**Stop closes mpv.**
-That is mpv's default: with nothing left to play it exits. Add `idle=yes` to `mpv.conf` (and `force-window=yes` to keep
-the window) if you want it to stay open after Stop.
-
 **Toggle Acompressor does nothing.**
 It relies on mpv's [`acompressor.lua`](https://github.com/mpv-player/mpv/blob/master/TOOLS/lua/acompressor.lua)
 script; copy it into your mpv `scripts` folder. The script also provides key bindings to adjust the compressor.

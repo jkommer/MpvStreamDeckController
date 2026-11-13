@@ -486,6 +486,30 @@
       "Tooltip": "Stop playback and clear the playlist",
       "UUID": "com.jkommer.mpv.stop"
     },
+    {
+      "Icon": "Images/key/27a_ab_loop_on",
+      "Name": "A-B Loop",
+      "States": [
+        {
+          "Image": "Images/key/27b_ab_loop_off",
+          "TitleAlignment": "middle",
+          "FontSize": 12
+        },
+        {
+          "Image": "Images/key/27c_ab_loop_start",
+          "TitleAlignment": "middle",
+          "FontSize": 12
+        },
+        {
+          "Image": "Images/key/27a_ab_loop_on",
+          "TitleAlignment": "middle",
+          "FontSize": 12
+        }
+      ],
+      "DisableAutomaticStates": true,
+      "SupportedInMultiActions": true,
+      "Tooltip": "Set the start of an A-B loop, then its end, then clear it",
+      "UUID": "com.jkommer.mpv.abloop"
     }
   ],
   "$schema": "https://schemas.elgato.com/streamdeck/plugins/manifest.json",
