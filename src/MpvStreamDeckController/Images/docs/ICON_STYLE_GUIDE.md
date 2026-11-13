@@ -79,6 +79,7 @@ A ready-to-use helper script is in `tools/icon_toolkit.py`. It encodes the tile,
 | `27a_ab_loop_on` / `27b_ab_loop_off` / `27c_ab_loop_start` | A-B loop: looping / off / only the start set | Timeline bar with two round knobs (the A and B points) and an arc with a single `>` arrowhead from B back to A | on: segment between the knobs, both knob rings, arc; start: the A knob's ring, with the arc dimmed; off = everything `#8a8a94` plus slash |
 | `28_custom_dial` (dial only) | Dial that runs custom mpv commands | The terminal window from `10_custom_command`, bolder, above the seek dial's `«  »` | prompt chevron, chevrons |
 | `29_quit` | Quit mpv | Power symbol: white ring open at the top with a vertical bar through the gap | bar |
+| `30a_deband_on` / `30b_deband_off` | Deband on / off | Descending white staircase (the colour bands) above a smooth S-curve following the same slope (the debanded gradient); both descend so the off-state slash crosses them | curve; off = everything `#8a8a94` plus slash |
 
 Toggle actions: provide an **on** icon (normal palette) and an **off** icon. The off icon is the on icon with identical geometry (do not alter shapes, heights or indicator elements), recoloured entirely to `#8a8a94`, with a diagonal slash from lower-left to upper-right (`M30 112 L114 32`, `stroke-width 8`, round caps) drawn on top. Nothing in the glyph may be rearranged or enlarged so that it collides with other elements. The same slash is used for the muted volume icon.
 

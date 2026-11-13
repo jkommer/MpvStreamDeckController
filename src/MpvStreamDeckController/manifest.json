@@ -554,6 +554,26 @@
       "Tooltip": "Quit mpv",
       "PropertyInspectorPath": "PropertyInspectors/Quit.html",
       "UUID": "com.jkommer.mpv.quit"
+    },
+    {
+      "Icon": "Images/key/30a_deband_on",
+      "Name": "Toggle Deband",
+      "States": [
+        {
+          "Image": "Images/key/30b_deband_off",
+          "TitleAlignment": "middle",
+          "FontSize": 12
+        },
+        {
+          "Image": "Images/key/30a_deband_on",
+          "TitleAlignment": "middle",
+          "FontSize": 12
+        }
+      ],
+      "DisableAutomaticStates": true,
+      "SupportedInMultiActions": true,
+      "Tooltip": "Toggle Deband",
+      "UUID": "com.jkommer.mpv.toggledeband"
     }
   ],
   "$schema": "https://schemas.elgato.com/streamdeck/plugins/manifest.json",

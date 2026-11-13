@@ -20,6 +20,7 @@ keys and dials act on the running player directly and dials show live state such
 | Toggle On Top | Key | Toggles whether the mpv window stays on top of other windows; the key shows whether it's on |
 | Toggle Fullscreen | Key | Toggles fullscreen; the key shows whether it's on |
 | Toggle Subtitle Visibility | Key | Shows or hides subtitles without changing the selected track; the key shows whether they're visible |
+| Toggle Deband | Key | Toggles mpv's debanding filter, which smooths visible colour steps in gradients; the key shows whether it's on |
 | Toggle Mute | Key | Mutes or unmutes; the key shows whether it's muted |
 | Volume Up / Volume Down | Key | Changes the volume by a configurable step |
 | Seek Back / Seek Forward | Key | Seeks backwards or forwards by a configurable number of seconds |
