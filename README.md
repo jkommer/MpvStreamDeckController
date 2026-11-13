@@ -34,7 +34,7 @@ keys and dials act on the running player directly and dials show live state such
 ## Requirements
 
 - Windows 10 or later
-- Stream Deck 6.4 or later
+- Stream Deck 7.6 or later
 - mpv
 
 ## Getting started

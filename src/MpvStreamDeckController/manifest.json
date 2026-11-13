@@ -573,9 +573,9 @@
       "MinimumVersion": "10"
     }
   ],
-  "SDKVersion": 2,
+  "SDKVersion": 3,
   "Software": {
-    "MinimumVersion": "6.4"
+    "MinimumVersion": "7.6"
   },
   "ApplicationsToMonitor": {
     "windows": [
